@@ -129,9 +129,18 @@ authForm.addEventListener('submit', async (event) => {
     authMessage.textContent = authMode === 'signup' ? '계정을 만들고 있어요...' : '로그인하고 있어요...';
     const email = document.querySelector('#authEmail').value.trim();
     const password = document.querySelector('#authPassword').value;
-    const result = authMode === 'signup'
-      ? await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin, data: { profile_type: new FormData(authForm).get('profileType') } } })
-      : await supabaseClient.auth.signInWithPassword({ email, password });
+    if (authMode === 'signup') {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, profileType: new FormData(authForm).get('profileType') })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) { authMessage.textContent = payload.error || '가입 확인 이메일을 보내지 못했어요.'; return; }
+      authMessage.textContent = '가입 확인 이메일을 보냈어요. 이메일의 확인 버튼을 눌러 가입을 완료해 주세요.';
+      return;
+    }
+    const result = await supabaseClient.auth.signInWithPassword({ email, password });
     if (result.error) {
       const message = result.error.message.toLowerCase();
       authMessage.textContent = message.includes('already registered')
@@ -145,14 +154,16 @@ authForm.addEventListener('submit', async (event) => {
             : result.error.message;
       return;
     }
-    authMessage.textContent = authMode === 'signup' && !result.data.session ? '가입 확인 이메일을 보냈어요. 이메일을 확인한 뒤 로그인해 주세요.' : '로그인되었습니다.';
+    authMessage.textContent = '로그인되었습니다.';
     if (result.data.session) {
       closeModal(authModal);
       if (pendingResult) { const savedRecord = await saveAnalysisRecord(pendingResult, pendingInput); renderReminderAction(pendingResult, pendingInput, savedRecord); renderPurchaseDecision(pendingResult, pendingInput, savedRecord); pendingResult = null; pendingInput = null; }
       if (pendingHistoryId) await openHistoryDetail(pendingHistoryId);
     }
   } catch {
-    authMessage.textContent = 'Supabase에 연결하지 못했어요. 프로젝트 URL, 공개 API 키와 Auth 설정을 확인해 주세요.';
+    authMessage.textContent = authMode === 'signup'
+      ? '가입 요청을 처리하지 못했어요. Supabase와 Resend 서버 설정을 확인해 주세요.'
+      : 'Supabase에 연결하지 못했어요. 프로젝트 URL, 공개 API 키와 Auth 설정을 확인해 주세요.';
   } finally {
     authSubmit.disabled = false;
   }

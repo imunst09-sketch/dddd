@@ -7,6 +7,9 @@ try { process.loadEnvFile(); } catch (error) { if (error.code !== 'ENOENT') thro
 const root = __dirname;
 const port = Number(process.env.PORT || 3000);
 const apiKey = process.env.GEMINI_API_KEY;
+const resendApiKey = process.env.RESEND_API_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const signupWindows = new Map();
 const requiredKeys = ['necessity_score', 'necessity_reason', 'opportunity_cost', 'budget_impact', 'eco_impact', 'smart_alternatives', 'final_verdict', 'encouragement_quote'];
 
 const systemPrompt = `너는 청소년과 성인의 합리적 소비를 돕는 친환경 소비 분석 엔진이다. 사용자가 보낸 구매 정보를 분석한다.
@@ -31,6 +34,30 @@ JSON의 모든 값은 한국어로 작성한다. 점수나 분류는 지정된 �
 예산이 0이면 예산 영향에 예산을 입력하지 않았다는 점을 정직하게 쓴다. 청소년 모드에서는 알바 시간을 단정하지 말고 일반적인 최저임금 수준을 참고한 대략적 체감으로 표현한다. 안전하지 않거나 청소년 구매 제한 품목이면 구매 비추천과 보호자 확인을 권한다.`;
 
 function json(res, status, body) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); }
+
+function getSupabaseBaseUrl() {
+  const url = new URL(process.env.SUPABASE_URL);
+  url.pathname = url.pathname.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '') || '/';
+  return url.toString().replace(/\/$/, '');
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+}
+
+function allowSignupAttempt(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = (forwarded ? forwarded.split(',').at(-1).trim() : req.socket.remoteAddress) || 'unknown';
+  const now = Date.now();
+  const window = signupWindows.get(ip);
+  if (!window || window.resetAt <= now) {
+    signupWindows.set(ip, { count: 1, resetAt: now + 15 * 60 * 1000 });
+    return true;
+  }
+  if (window.count >= 5) return false;
+  window.count += 1;
+  return true;
+}
 
 function isValidResult(result) {
   return result && requiredKeys.every((key) => Object.prototype.hasOwnProperty.call(result, key)) && result.eco_impact && Array.isArray(result.smart_alternatives);
@@ -100,6 +127,78 @@ const server = http.createServer(async (req, res) => {
   }
   if (req.method === 'GET' && req.url === '/api/config') {
     return json(res, 200, { supabaseUrl: process.env.SUPABASE_URL || '', supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '' });
+  }
+  if (req.method === 'POST' && req.url === '/api/signup') {
+    let raw = '';
+    let tooLarge = false;
+    req.on('data', (chunk) => {
+      raw += chunk;
+      if (raw.length > 10000) { tooLarge = true; raw = ''; }
+    });
+    req.on('end', async () => {
+      if (tooLarge) return json(res, 413, { error: '입력 내용이 너무 커요.' });
+      if (!resendApiKey || !supabaseServiceKey || !process.env.SUPABASE_URL) {
+        return json(res, 503, { error: '가입 이메일 서버 설정이 아직 완료되지 않았어요.' });
+      }
+
+      let input;
+      try { input = JSON.parse(raw); } catch { return json(res, 400, { error: '회원가입 정보를 확인해 주세요.' }); }
+      const email = String(input.email || '').trim().toLowerCase();
+      const password = String(input.password || '');
+      const profileType = input.profileType;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 6 || password.length > 128 || !['청소년', '성인'].includes(profileType)) {
+        return json(res, 400, { error: '이메일, 6자 이상 비밀번호, 프로필 유형을 확인해 주세요.' });
+      }
+      if (!allowSignupAttempt(req)) return json(res, 429, { error: '가입 요청이 많아요. 잠시 후 다시 시도해 주세요.' });
+
+      let redirectTo;
+      try {
+        const origin = new URL(req.headers.origin);
+        if (!['https:', 'http:'].includes(origin.protocol) || (origin.protocol === 'http:' && origin.hostname !== 'localhost')) throw new Error('Invalid origin');
+        redirectTo = origin.origin;
+      } catch { return json(res, 400, { error: '확인 이메일을 보낼 사이트 주소를 확인할 수 없어요.' }); }
+
+      try {
+        const supabaseUrl = getSupabaseBaseUrl();
+        const signupResponse = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link?redirect_to=${encodeURIComponent(redirectTo)}`, {
+          method: 'POST',
+          headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'signup', email, password, data: { profile_type: profileType } })
+        });
+        const signupPayload = await signupResponse.json().catch(() => ({}));
+        if (!signupResponse.ok) {
+          const message = [signupPayload.msg, signupPayload.message, signupPayload.error_description].filter(Boolean).join(' ');
+          const exists = /already|registered/i.test(message);
+          return json(res, exists ? 409 : 502, { error: exists ? '이미 가입된 이메일이에요. 로그인해 주세요.' : 'Supabase에서 가입 확인 링크를 만들지 못했어요.' });
+        }
+
+        const actionLink = signupPayload.properties?.action_link || signupPayload.action_link;
+        if (!actionLink || new URL(actionLink).origin !== new URL(supabaseUrl).origin) {
+          return json(res, 502, { error: '가입 확인 링크를 만들지 못했어요.' });
+        }
+
+        const confirmUrl = escapeHtml(actionLink);
+        const mailResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: process.env.RESEND_FROM || 'Greenchoice <onboarding@resend.dev>',
+            to: [email],
+            subject: '그린초이스 가입을 확인해 주세요',
+            html: `<div style="font-family:Arial,sans-serif;line-height:1.8;color:#173d32"><h2>그린초이스 가입 확인</h2><p>아래 버튼을 눌러 이메일 주소를 확인하고 회원가입을 완료해 주세요.</p><p><a href="${confirmUrl}" style="display:inline-block;padding:12px 18px;border-radius:8px;background:#27664b;color:#fff;text-decoration:none">이메일 확인하고 가입 완료하기</a></p><p>본인이 신청하지 않았다면 이 메일을 무시해 주세요.</p></div>`,
+            text: `그린초이스 가입을 완료하려면 아래 링크를 열어 이메일 주소를 확인해 주세요.\n${actionLink}\n본인이 신청하지 않았다면 이 메일을 무시해 주세요.`
+          })
+        });
+        if (!mailResponse.ok) {
+          console.error('Resend email request failed', mailResponse.status);
+          return json(res, 502, { error: '가입 확인 이메일을 보내지 못했어요. Resend 발신 주소 설정을 확인해 주세요.' });
+        }
+        return json(res, 200, { message: '가입 확인 이메일을 보냈어요.' });
+      } catch {
+        return json(res, 502, { error: '가입 확인 이메일을 보내지 못했어요. 서버 설정을 확인해 주세요.' });
+      }
+    });
+    return;
   }
   if (req.method === 'POST' && req.url === '/api/analyze') {
     let raw = '';
