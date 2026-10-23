@@ -13,7 +13,7 @@ const signupWindows = new Map();
 const privacyPolicyVersion = '1.0';
 const requiredKeys = ['necessity_score', 'necessity_reason', 'opportunity_cost', 'budget_impact', 'eco_impact', 'smart_alternatives', 'final_verdict', 'final_verdict_reason', 'encouragement_quote'];
 
-const systemPrompt = `너는 청소년과 성인의 합리적 소비를 돕는 친환경 소비 분석 엔진이다. 사용자가 보낸 구매 정보를 분석한다.
+const systemPrompt = `너는 합리적 소비를 돕는 친환경 소비 분석 엔진이다. 사용자가 보낸 구매 정보를 분석한다.
 반드시 마크다운, 코드펜스, 인사말 없이 아래 JSON 하나만 반환한다. 모든 설명은 한국어로 쓴다.
 사용자가 입력하지 않은 제품 정보, 가격, 소재, 제조국, 수치, 탄소량을 만들어내지 않는다. 정확한 제품 사양을 모르면 제품군 기준의 일반적인 참고 의견이라고 밝힌다.
 필요성은 입력된 구매 목적, 사용 빈도, 비슷한 물건 보유 여부, 예산을 근거로 판단한다. 필요성 판단과 최종 제안은 서로 일치시킨다.
@@ -22,11 +22,11 @@ const systemPrompt = `너는 청소년과 성인의 합리적 소비를 돕는 �
 - 심사숙고: 위 두 기준에 해당하지 않는 경우.
 분류에 따라 final_verdict는 필수=지금 구매 추천, 심사숙고=3일 냉각기간 추천, 불필요=구매 비추천으로 쓴다.
 necessity_reason은 2~3문장으로 입력에서 실제로 영향을 준 항목을 구체적으로 설명한다. final_verdict_reason은 최종 제안의 이유와 사용자가 취할 다음 행동을 1~2문장으로 쓴다.
-opportunity_cost는 가격으로 포기하게 되는 다른 선택을 설명한다. 모드에 맞춰 말하되, 근거 없는 임금·시간·상품 가격을 단정하지 않는다.
+opportunity_cost는 가격으로 포기하게 되는 다른 선택을 설명하되, 근거 없는 임금·시간·상품 가격을 단정하지 않는다.
 budget_impact는 예산 입력 유무에 따른 부담 해석을 한 문장으로 쓴다. 숫자 비율은 서버가 입력값으로 계산하므로 새 비율을 추측하지 않는다.
 환경 영향은 제품의 전체 생애주기 정보가 없으면 정량 탄소량을 제시하지 않는다. eco_impact.reason에는 제품군 기준의 환경 고려점을, eco_tip에는 구매 전 또는 사용 중 실천할 수 있는 구체적인 방법을 쓴다.
 smart_alternatives에는 이 제품에 맞는 실용적인 대안 2~3개를 쓴다.
-안전하지 않거나 청소년 구매 제한 품목이면 구매 비추천과 보호자 확인을 권한다.
+안전 또는 법적 구매 제한이 분명한 품목은 구매를 권하지 않고 관련 규정을 확인하도록 안내한다.
 JSON 형식:
 {
   "necessity_score": "필수 | 심사숙고 | 불필요",
@@ -107,7 +107,7 @@ function buildBudgetImpact(input, note = '') {
 
 function demoResult(input) {
   const [score, verdict] = demoScore(input);
-  return { demo: true, necessity_score: score, necessity_reason: `${input.item}을(를) ${input.purpose} 목적과 ${input.frequency} 사용 기준으로 살펴봤어요. ${input.hasSimilarItem === '예' ? '비슷한 물건을 이미 가지고 있다는 점을 반영했어요.' : '비슷한 물건이 없다고 답한 점을 반영했어요.'}`, opportunity_cost: input.mode === '청소년' ? `${Number(input.price).toLocaleString('ko-KR')}원을 다른 취미나 필요한 지출을 위해 남겨둘 수도 있어요.` : `${Number(input.price).toLocaleString('ko-KR')}원을 저축이나 다른 생활비를 위해 남겨둘 수도 있어요.`, budget_impact: buildBudgetImpact(input, '데모 분석에서는 입력 정보를 기준으로 예산 영향을 계산했어요.'), eco_impact: { level: '중간', reason: '제품의 소재와 제조·배송 정보가 없어 제품군 기준의 일반적인 참고 판단이에요.', eco_tip: '오래 사용할 수 있는 제품을 고르고, 구매 전 중고·리사이클 제품도 비교해보세요.' }, smart_alternatives: ['필요한 기능만 갖춘 제품이나 수리 가능한 모델을 비교해보세요.', '중고 거래 또는 대여로 먼저 사용해볼 수 있어요.'], final_verdict: verdict, final_verdict_reason: `입력한 구매 목적, 사용 빈도, 보유 여부와 예산 조건을 기준으로 ${verdict}을 제안해요. 구매 전 비슷한 제품과 대안을 한 번 더 비교해보세요.`, encouragement_quote: '천천히 비교하고 오래 쓰는 선택도 충분히 멋진 소비예요.' };
+  return { demo: true, necessity_score: score, necessity_reason: `${input.item}을(를) ${input.purpose} 목적과 ${input.frequency} 사용 기준으로 살펴봤어요. ${input.hasSimilarItem === '예' ? '비슷한 물건을 이미 가지고 있다는 점을 반영했어요.' : '비슷한 물건이 없다고 답한 점을 반영했어요.'}`, opportunity_cost: `${Number(input.price).toLocaleString('ko-KR')}원을 다른 필요한 지출이나 저축을 위해 남겨둘 수도 있어요.`, budget_impact: buildBudgetImpact(input, '데모 분석에서는 입력 정보를 기준으로 예산 영향을 계산했어요.'), eco_impact: { level: '중간', reason: '제품의 소재와 제조·배송 정보가 없어 제품군 기준의 일반적인 참고 판단이에요.', eco_tip: '오래 사용할 수 있는 제품을 고르고, 구매 전 중고·리사이클 제품도 비교해보세요.' }, smart_alternatives: ['필요한 기능만 갖춘 제품이나 수리 가능한 모델을 비교해보세요.', '중고 거래 또는 대여로 먼저 사용해볼 수 있어요.'], final_verdict: verdict, final_verdict_reason: `입력한 구매 목적, 사용 빈도, 보유 여부와 예산 조건을 기준으로 ${verdict}을 제안해요. 구매 전 비슷한 제품과 대안을 한 번 더 비교해보세요.`, encouragement_quote: '천천히 비교하고 오래 쓰는 선택도 충분히 멋진 소비예요.' };
 }
 
 async function analyze(input) {
@@ -185,9 +185,8 @@ const server = http.createServer(async (req, res) => {
       try { input = JSON.parse(raw); } catch { return json(res, 400, { error: '회원가입 정보를 확인해 주세요.' }); }
       const email = String(input.email || '').trim().toLowerCase();
       const password = String(input.password || '');
-      const profileType = input.profileType;
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 6 || password.length > 128 || !['청소년', '성인'].includes(profileType)) {
-        return json(res, 400, { error: '이메일, 6자 이상 비밀번호, 프로필 유형을 확인해 주세요.' });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 6 || password.length > 128) {
+        return json(res, 400, { error: '이메일과 6자 이상 비밀번호를 확인해 주세요.' });
       }
       if (input.privacyConsent !== true) return json(res, 400, { error: '개인정보처리방침에 동의해야 회원가입할 수 있어요.' });
       if (!allowSignupAttempt(req)) return json(res, 429, { error: '가입 요청이 많아요. 잠시 후 다시 시도해 주세요.' });
@@ -204,7 +203,7 @@ const server = http.createServer(async (req, res) => {
         const signupResponse = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link?redirect_to=${encodeURIComponent(redirectTo)}`, {
           method: 'POST',
           headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'signup', email, password, data: { profile_type: profileType, privacy_consent: true, privacy_policy_version: privacyPolicyVersion, privacy_consented_at: new Date().toISOString() } })
+          body: JSON.stringify({ type: 'signup', email, password, data: { privacy_consent: true, privacy_policy_version: privacyPolicyVersion, privacy_consented_at: new Date().toISOString() } })
         });
         const signupPayload = await signupResponse.json().catch(() => ({}));
         if (!signupResponse.ok) {

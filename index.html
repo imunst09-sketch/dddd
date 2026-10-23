@@ -62,7 +62,6 @@
 
     <section class="analyze-section section-shell" id="analyze">
       <div class="analysis-heading"><div><div class="section-kicker">LET'S CHECK</div><h2>무엇을 살까<br /><span>고민하고 있나요?</span></h2></div><div class="mascot-note"><div class="mini-mascot">●</div><p>천천히 적어도 괜찮아요.<br />같이 살펴볼게요!</p></div></div>
-      <div class="mode-switch" role="group" aria-label="사용자 모드 선택"><button type="button" class="mode-button active" data-mode="teen">청소년 모드 <span>가볍고 쉽게</span></button><button type="button" class="mode-button" data-mode="adult">성인 모드 <span>조금 더 자세히</span></button></div>
       <form class="analysis-form" id="analysisForm">
         <div class="form-main">
           <div class="form-field large-field"><label for="item">무엇을 사고 싶나요? <small>필수</small></label><div class="input-with-icon"><span>⌕</span><input id="item" name="item" type="text" placeholder="예: 무선 이어폰, 운동화, 텀블러" required /></div><p class="field-hint">제품 이름이나 사고 싶은 물건을 적어주세요.</p></div>
@@ -93,13 +92,6 @@
       <form id="authForm">
         <div class="form-field"><label for="authEmail">이메일</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required /></div>
         <div class="form-field"><label for="authPassword">비밀번호</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="6자 이상 입력해 주세요" minlength="6" required /></div>
-        <div class="profile-select" id="profileSelect" hidden>
-          <label>프로필 유형</label>
-          <div class="profile-options">
-            <label><input type="radio" name="profileType" value="청소년" checked /><span>청소년</span></label>
-            <label><input type="radio" name="profileType" value="성인" /><span>성인</span></label>
-          </div>
-        </div>
         <div class="privacy-consent" id="privacyConsentField" hidden>
           <label class="privacy-check" for="privacyConsent"><input id="privacyConsent" name="privacyConsent" type="checkbox" /><span>개인정보 수집·이용에 동의합니다 <small>필수</small></span></label>
           <button type="button" class="privacy-link" id="showPrivacyPolicy">개인정보처리방침 보기 <span>↗</span></button>
@@ -118,7 +110,7 @@
       <div class="privacy-content">
         <p>greenchoice는 회원가입, 소비 분석 기록 저장, 이메일 확인을 위해 필요한 개인정보를 처리합니다.</p>
         <section><h3>1. 수집하는 정보</h3><ul>
-          <li>회원가입: 이메일 주소, 비밀번호, 프로필 유형(청소년 또는 성인)</li>
+          <li>회원가입: 이메일 주소, 비밀번호</li>
           <li>동의 기록: 동의 여부, 정책 버전, 동의 시각</li>
           <li>소비 분석: 물건 이름, 가격, 예산, 구매 목적, 사용 빈도, 비슷한 물건 보유 여부, 중고 고려 여부와 분석 결과</li>
           <li>리마인드 이용 시: 이메일 주소, 물건 이름, 가격, 알림 예정 시각</li>

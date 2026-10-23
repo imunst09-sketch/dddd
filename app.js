@@ -1,4 +1,3 @@
-const modeButtons = document.querySelectorAll('.mode-button');
 const loggedOutActions = document.querySelector('#loggedOutActions');
 const loggedInActions = document.querySelector('#loggedInActions');
 const loginButton = document.querySelector('#loginButton');
@@ -40,7 +39,6 @@ const savePrompt = document.querySelector('#savePrompt');
 const authForm = document.querySelector('#authForm');
 const authMessage = document.querySelector('#authMessage');
 const authSubmit = document.querySelector('#authSubmit');
-const profileSelect = document.querySelector('#profileSelect');
 const privacyConsentField = document.querySelector('#privacyConsentField');
 const privacyConsent = document.querySelector('#privacyConsent');
 const authTitle = document.querySelector('#authTitle');
@@ -62,7 +60,6 @@ function setAuthMode(nextMode) {
   authMode = nextMode;
   document.querySelectorAll('.auth-tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.authTab === nextMode));
   const signup = nextMode === 'signup';
-  profileSelect.hidden = !signup;
   privacyConsentField.hidden = !signup;
   privacyConsent.required = signup;
   privacyConsent.checked = false;
@@ -111,13 +108,6 @@ async function initSupabase() {
 
 function openAuth(nextMode = 'login') { setAuthMode(nextMode); openModal(authModal); setTimeout(() => document.querySelector('#authEmail').focus(), 0); }
 
-modeButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    modeButtons.forEach((item) => item.classList.remove('active'));
-    button.classList.add('active');
-  });
-});
-
 loginButton.addEventListener('click', () => openAuth('login'));
 signupButton.addEventListener('click', () => openAuth('signup'));
 historyButton.addEventListener('click', async () => { openModal(historyModal); await renderHistory(); });
@@ -139,7 +129,7 @@ authForm.addEventListener('submit', async (event) => {
       const response = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, profileType: new FormData(authForm).get('profileType'), privacyConsent: privacyConsent.checked })
+        body: JSON.stringify({ email, password, privacyConsent: privacyConsent.checked })
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) { authMessage.textContent = payload.error || '가입 확인 이메일을 보내지 못했어요.'; return; }
@@ -356,7 +346,7 @@ async function renderHistory() {
     const item = document.createElement('article'); item.className = 'history-item';
     const date = new Date(record.created_at || record.savedAt || Date.now()).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
     const statusLabel = { pending: '아직 결정 전', skipped: '참았어요!', purchased: '구매했어요', secondhand: '중고로 샀어요' }[status] || status;
-    item.append(makeTextElement('div', 'history-date', date), makeTextElement('h3', '', input.item), makeTextElement('span', 'history-verdict', result.final_verdict || '분석 완료'), makeTextElement('p', '', `${Number(input.price).toLocaleString('ko-KR')}원 · ${input.mode} 모드`), makeTextElement('div', 'history-carbon', `예상 탄소 ${estimateCarbon(record)}kg · ${statusLabel}`));
+    item.append(makeTextElement('div', 'history-date', date), makeTextElement('h3', '', input.item), makeTextElement('span', 'history-verdict', result.final_verdict || '분석 완료'), makeTextElement('p', '', `${Number(input.price).toLocaleString('ko-KR')}원`), makeTextElement('div', 'history-carbon', `예상 탄소 ${estimateCarbon(record)}kg · ${statusLabel}`));
     const actions = document.createElement('div'); actions.className = 'history-actions';
     [['skipped', '참았어요! (지출 안 함)'], ['purchased', '구매했어요'], ['secondhand', '중고로 샀어요']].forEach(([nextStatus, label]) => { const button = document.createElement('button'); button.type = 'button'; button.dataset.recordId = record.id; button.dataset.status = nextStatus; button.textContent = label; button.className = nextStatus === status ? 'active' : ''; actions.append(button); });
     if (status === 'secondhand') { const ecoButton = document.createElement('button'); ecoButton.type = 'button'; ecoButton.dataset.recordId = record.id; ecoButton.dataset.eco = 'true'; ecoButton.textContent = record.eco_tip_applied ? '✓ 친환경 팁 인증 완료' : '친환경 팁 적용했어요'; ecoButton.className = record.eco_tip_applied ? 'active eco-cert' : 'eco-cert'; actions.append(ecoButton); }
@@ -391,7 +381,7 @@ form.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!getValue('item') || !getValue('price')) return;
   const purpose = getValue('reason') === '기타' ? getValue('otherPurpose') : getValue('reason');
-  const input = { mode: document.querySelector('.mode-button.active')?.dataset.mode === 'adult' ? '성인' : '청소년', item: getValue('item'), price: Number(getValue('price')), budget: Number(getValue('budget')) || 0, purpose, frequency: getValue('frequency'), hasSimilarItem: getValue('duplicate'), considersSecondhand: getValue('recycle') };
+  const input = { item: getValue('item'), price: Number(getValue('price')), budget: Number(getValue('budget')) || 0, purpose, frequency: getValue('frequency'), hasSimilarItem: getValue('duplicate'), considersSecondhand: getValue('recycle') };
   analysisResult.classList.remove('visible'); analysisResult.setAttribute('aria-hidden', 'true'); loadingCard.classList.add('visible'); loadingCard.setAttribute('aria-hidden', 'false'); loadingCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
   try {
     const response = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
