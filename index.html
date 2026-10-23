@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="사기 전 한 번 더 생각하는 합리적 소비와 친환경 습관 도우미" />
+  <title>그린초이스 | 합리적 소비 도우미</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="logo" href="#top" aria-label="그린초이스 홈"><span class="logo-leaf">✦</span><span>green<span>choice</span></span></a>
+      <nav class="main-nav" aria-label="주 메뉴">
+        <a href="#how-it-works">이용 방법</a>
+        <a href="#analyze">소비 분석</a>
+        <a href="#my-space">나의 공간</a>
+      </nav>
+      <div class="account-area"><div class="logged-out-actions" id="loggedOutActions"><button type="button" class="header-auth-button" id="loginButton">로그인</button><button type="button" class="header-auth-button filled" id="signupButton">회원가입</button></div><div class="logged-in-actions" id="loggedInActions" hidden><span class="header-user-email" id="accountEmail"></span><span class="header-badge" id="badgeCount">0개 뱃지</span><button type="button" class="header-action-button" id="historyButton">사용 기록</button><button type="button" class="header-action-button logout" id="logoutButton">로그아웃</button></div></div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero-section">
+      <div class="hero-copy">
+        <div class="pill-label"><span class="sparkle">✦</span> 소비 전, 잠깐의 초록 멈춤</div>
+        <h1>사기 전에<br /><em>한 번 더,</em> 생각해요.</h1>
+        <p>사고 싶은 물건을 알려주면<br />내 지갑과 지구에 어떤 선택인지 함께 살펴볼게요.</p>
+        <a class="primary-button" href="#analyze">내 소비 점검하기 <span>→</span></a>
+        <div class="hero-note"><span class="tiny-check">✓</span> 가입 없이 바로 시작할 수 있어요</div>
+      </div>
+      <div class="hero-visual" aria-label="지구를 생각하는 소비를 표현한 일러스트">
+        <div class="sun-blob"></div><div class="leaf-blob leaf-one"></div><div class="leaf-blob leaf-two"></div>
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="planet"><span class="planet-face">⌣</span><span class="planet-eye eye-one"></span><span class="planet-eye eye-two"></span><span class="planet-leaf">❧</span></div>
+        <div class="float-card savings-card"><span class="mini-icon coin-icon">₩</span><div><b>이번 달 절약</b><strong>32,000원</strong></div><span class="trend">↗</span></div>
+        <div class="float-card eco-card"><span class="mini-icon">♧</span><div><b>환경 점수</b><strong>좋음 <span>+12</span></strong></div></div>
+        <div class="star star-a">✦</div><div class="star star-b">✧</div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="서비스가 분석하는 항목">
+      <span>greenchoice는 이렇게 살펴봐요</span><div></div><span>필요성</span><span>예산 부담</span><span>기회비용</span><span>탄소발자국</span>
+    </section>
+
+    <section class="how-section section-shell" id="how-it-works">
+      <div class="section-kicker">HOW IT WORKS</div>
+      <div class="section-title-row"><h2>소비에도<br /><span>잠깐의 여유</span>가 필요하니까.</h2><p>정답을 대신 고르는 대신,<br />더 나은 결정을 내릴 수 있게 도와드려요.</p></div>
+      <div class="steps-grid">
+        <article class="step-card step-green"><div class="step-number">01</div><div class="step-icon icon-input">⌕</div><h3>사고 싶은 물건을<br />입력해요</h3><p>가격과 구매 이유를<br />간단히 알려주세요.</p></article>
+        <article class="step-card step-cream"><div class="step-number">02</div><div class="step-icon icon-think">✦</div><h3>여러 기준으로<br />함께 살펴봐요</h3><p>필요성부터 탄소발자국까지<br />꼼꼼하게 분석해요.</p></article>
+        <article class="step-card step-mint"><div class="step-number">03</div><div class="step-icon icon-sprout">♧</div><h3>나에게 맞는<br />선택을 찾아요</h3><p>대체 방법과 작은 실천까지<br />추천해드려요.</p></article>
+      </div>
+    </section>
+
+    <section class="analyze-section section-shell" id="analyze">
+      <div class="analysis-heading"><div><div class="section-kicker">LET'S CHECK</div><h2>무엇을 살까<br /><span>고민하고 있나요?</span></h2></div><div class="mascot-note"><div class="mini-mascot">●</div><p>천천히 적어도 괜찮아요.<br />같이 살펴볼게요!</p></div></div>
+      <div class="mode-switch" role="group" aria-label="사용자 모드 선택"><button type="button" class="mode-button active" data-mode="teen">청소년 모드 <span>가볍고 쉽게</span></button><button type="button" class="mode-button" data-mode="adult">성인 모드 <span>조금 더 자세히</span></button></div>
+      <form class="analysis-form" id="analysisForm">
+        <div class="form-main">
+          <div class="form-field large-field"><label for="item">무엇을 사고 싶나요? <small>필수</small></label><div class="input-with-icon"><span>⌕</span><input id="item" name="item" type="text" placeholder="예: 무선 이어폰, 운동화, 텀블러" required /></div><p class="field-hint">제품 이름이나 사고 싶은 물건을 적어주세요.</p></div>
+          <div class="form-row"><div class="form-field"><label for="price">예상 가격 <small>필수</small></label><div class="input-unit"><input id="price" name="price" type="number" placeholder="0" min="0" required /><span>원</span></div></div><div class="form-field"><label for="budget">이번 달 쓸 수 있는 돈</label><div class="input-unit"><input id="budget" name="budget" type="number" placeholder="0" min="0" /><span>원</span></div></div></div>
+          <div class="form-field"><label>구매 목적은 무엇인가요? <small>필수</small></label><div class="choice-grid purpose-grid"><label class="choice"><input type="radio" name="reason" value="필수품" checked /><span>필수품</span></label><label class="choice"><input type="radio" name="reason" value="취미·덕질" /><span>취미·덕질</span></label><label class="choice"><input type="radio" name="reason" value="선물" /><span>선물</span></label><label class="choice"><input type="radio" name="reason" value="충동적 지적 욕구" /><span>충동적 지적 욕구</span></label><label class="choice"><input type="radio" name="reason" value="스트레스 해소" /><span>스트레스 해소</span></label><label class="choice"><input type="radio" name="reason" value="기타" id="otherReason" /><span>기타</span></label></div><input class="other-purpose" id="otherPurpose" name="otherPurpose" type="text" placeholder="어떤 목적인지 직접 적어주세요" aria-label="기타 구매 목적" /></div>
+          <div class="form-field"><label for="frequency">얼마나 자주 사용할 것 같나요? <small>필수</small></label><select id="frequency" name="frequency"><option>매일</option><option>주 1~2회</option><option>가끔</option><option>이벤트성</option></select></div>
+          <div class="question-block"><div class="form-field"><label>비슷한 역할을 하는 물건을 이미 갖고 있나요?</label><div class="binary-choice"><label class="choice"><input type="radio" name="duplicate" value="예" /><span>예</span></label><label class="choice"><input type="radio" name="duplicate" value="아니오" checked /><span>아니오</span></label></div></div><div class="form-field"><label>중고나 리사이클 제품도 고려할 의향이 있나요?</label><div class="binary-choice"><label class="choice"><input type="radio" name="recycle" value="예" checked /><span>예</span></label><label class="choice"><input type="radio" name="recycle" value="아니오" /><span>아니오</span></label></div></div></div>
+          <button class="analyze-button" type="submit">AI 합리성 &amp; 환경 영향 분석하기 <span>✦</span></button>
+        </div>
+        <aside class="form-side"><div class="side-illustration"><div class="side-leaf">♧</div><div class="side-sun"></div><div class="side-ground"></div></div><div class="side-copy"><b>작은 질문 하나가</b><strong>더 좋은 소비를<br />만들 수 있어요.</strong><p>입력한 정보는 분석 결과를<br />만드는 데만 사용돼요.</p></div></aside>
+      </form>
+      <div class="loading-card" id="loadingCard" aria-live="polite" aria-hidden="true"><div class="loading-mascot"><span></span><i></i><b></b></div><div><div class="result-badge">GREENCHOICE AI</div><h3>AI가 소비의 가치를 계산 중입니다<span class="loading-dots"><i>.</i><i>.</i><i>.</i></span></h3><p>필요성, 예산 부담, 대체 가능성, 환경 영향을 차근차근 살펴보고 있어요.</p></div><button type="button" class="reset-button" id="resetButton">입력 수정하기</button></div>
+      <div class="analysis-result" id="analysisResult" aria-live="polite" aria-hidden="true"></div>
+    </section>
+
+    <section class="quote-section"><div class="quote-mark">“</div><p>좋은 소비는<br /><em>나를 아끼는 일</em>이자<br />지구를 아끼는 일이에요.</p><span>— greenchoice team</span></section>
+  </main>
+  <footer class="site-footer" id="my-space"><div class="logo"><span class="logo-leaf">✦</span><span>green<span>choice</span></span></div><p>합리적 소비 & 친환경 습관 도우미</p><span>© 2026 ROOTPIE</span></footer>
+  <div class="modal-backdrop" id="authModal" hidden><section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><button class="modal-close" type="button" data-close-modal="authModal">×</button><div class="section-kicker">WELCOME TO GREENCHOICE</div><h2 id="authTitle">내 소비 기록을<br /><span>안전하게 저장해요.</span></h2><div class="auth-tabs"><button type="button" class="auth-tab active" data-auth-tab="login">로그인</button><button type="button" class="auth-tab" data-auth-tab="signup">회원가입</button></div><form id="authForm"><div class="form-field"><label for="authEmail">이메일</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required /></div><div class="form-field"><label for="authPassword">비밀번호</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="6자 이상 입력해 주세요" minlength="6" required /></div><div class="profile-select" id="profileSelect" hidden><label>프로필 유형</label><div class="profile-options"><label><input type="radio" name="profileType" value="청소년" checked /><span>청소년</span></label><label><input type="radio" name="profileType" value="성인" /><span>성인</span></label></div></div><button class="analyze-button auth-submit" type="submit" id="authSubmit">로그인하기 <span>→</span></button><p class="auth-message" id="authMessage" role="status"></p></form></section></div>
+  <div class="modal-backdrop" id="savePrompt" hidden><section class="save-modal" role="dialog" aria-modal="true"><button class="modal-close" type="button" data-close-modal="savePrompt">×</button><div class="save-sparkle">✦</div><h2>분석 결과를<br /><span>저장해볼까요?</span></h2><p>로그인하면 소비 기록을 모아보고<br />친환경 챌린지에도 참여할 수 있어요.</p><div class="save-actions"><button type="button" class="analyze-button" id="saveLoginButton">로그인하고 내 소비 기록 저장하기 <span>→</span></button><button type="button" class="text-button" id="challengeLoginButton">로그인 후 챌린지 참여하기</button><button type="button" class="later-button" data-close-modal="savePrompt">나중에 할게요</button></div></section></div>
+  <div class="modal-backdrop" id="historyModal" hidden><section class="history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle"><button class="modal-close" type="button" data-close-modal="historyModal">×</button><div class="section-kicker">MY GREEN RECORD</div><h2 id="historyTitle">내 소비 히스토리<br /><span>&amp; 절약 저금통</span></h2><div class="badge-challenge"><div class="badge-heading"><div><span class="section-kicker">CONSUMPTION CHALLENGE</span><h3>작은 실천이<br /><span>멋진 뱃지</span>가 돼요.</h3></div><span class="badge-progress" id="badgeProgress">0 / 4 획득</span></div><div class="badge-grid" id="badgeGrid"></div></div><div class="dashboard-grid"><div class="dashboard-stat primary"><span>이번 달 총 분석</span><strong id="monthlyAnalyses">0회</strong><small>소비를 점검한 횟수</small></div><div class="dashboard-stat"><span>AI 추천을 따름</span><strong id="aiRecommendedBought">0회</strong><small>추천 후 구매 완료</small></div><div class="dashboard-stat"><span>비추천을 따름</span><strong id="aiFollowedAvoid">0회</strong><small>구매하지 않음</small></div><div class="dashboard-stat warning"><span>비추천인데 구매</span><strong id="aiIgnored">0회</strong><small>AI 가이드와 다른 선택</small></div><div class="dashboard-chart"><div class="chart-heading"><span>구매 목적별 지출 비중</span><small>전체 기록 기준</small></div><div class="donut-wrap"><canvas id="purposeChart" aria-label="구매 목적별 지출 비중 원형 차트"></canvas><div class="donut-center"><strong id="purposeTotal">0원</strong><span>분석 금액</span></div></div><div class="chart-legend" id="purposeLegend"></div></div><div class="dashboard-guide"><div class="chart-heading"><span>AI 가이드 준수율</span><small>추천과 실제 행동 비교</small></div><div class="guide-ring"><div><strong id="guideRate">0%</strong><span>준수율</span></div></div><p id="guideCopy">아직 충분한 기록이 없어요.<br />분석 결과를 저장해보세요.</p></div><div class="dashboard-carbon"><div class="carbon-leaf">♧</div><div><span>AI 가이드로 지킨 환경</span><strong id="carbonTrees">소나무 0그루를 심은 효과</strong><small id="carbonDetail">0kg CO₂ 절감</small></div></div></div><div class="savings-stats"><div><span>누적 절약 저금통</span><strong id="savedMoney">0원</strong></div><div><span>절감된 탄소 배출량</span><strong id="savedCarbon">0kg</strong></div></div><p class="history-intro">각 기록에서 실제 행동을 선택하면 AI 추천 준수율과 환경 효과에 반영돼요.</p><div class="history-list" id="historyList"></div></section></div>
+  <div class="modal-backdrop" id="historyDetailModal" hidden><section class="history-detail-modal" role="dialog" aria-modal="true" aria-labelledby="historyDetailTitle"><button class="modal-close" type="button" data-close-modal="historyDetailModal">×</button><div class="section-kicker">COOLING CHECK-IN</div><h2 id="historyDetailTitle">아직도<br /><span>사고 싶나요?</span></h2><p class="history-detail-copy" id="historyDetailCopy"></p><div class="detail-choice-actions"><button type="button" class="detail-choice yes" data-detail-status="purchased">지금도 사고 싶어요</button><button type="button" class="detail-choice no" data-detail-status="skipped">안 사기로 했어요!</button></div><p class="auth-message" id="historyDetailMessage"></p></section></div>
+  <div class="modal-backdrop" id="badgeShareModal" hidden><section class="badge-share-modal" role="dialog" aria-modal="true"><button class="modal-close" type="button" data-close-modal="badgeShareModal">×</button><div class="section-kicker">BADGE SHARE</div><h2>나의 소비 뱃지를<br /><span>자랑해보세요.</span></h2><img id="badgeShareImage" class="badge-share-image" alt="획득한 소비 뱃지 공유 이미지" /><p id="badgeShareCopy" class="history-intro"></p><button type="button" class="analyze-button" id="nativeShareButton">SNS로 공유하기 <span>↗</span></button></section></div>
+  <script src="app.js"></script>
+</body>
+</html>

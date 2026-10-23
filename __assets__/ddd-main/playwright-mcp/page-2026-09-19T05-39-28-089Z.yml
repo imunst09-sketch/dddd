@@ -1,0 +1,191 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "그린초이스 홈" [ref=e4] [cursor=pointer]:
+        - /url: "#top"
+        - generic [ref=e5]: ✦
+        - generic [ref=e6]: greenchoice
+      - navigation "주 메뉴" [ref=e7]:
+        - link "이용 방법" [ref=e8] [cursor=pointer]:
+          - /url: "#how-it-works"
+        - link "소비 분석" [ref=e9] [cursor=pointer]:
+          - /url: "#analyze"
+        - link "나의 공간" [ref=e10] [cursor=pointer]:
+          - /url: "#my-space"
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - button "로그인" [ref=e13] [cursor=pointer]
+          - button "회원가입" [ref=e14] [cursor=pointer]
+        - generic [ref=e15]:
+          - generic [ref=e16]: 0개 뱃지
+          - button "사용 기록" [ref=e17] [cursor=pointer]
+          - button "로그아웃" [ref=e18] [cursor=pointer]
+  - main [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - generic [ref=e23]: ✦
+          - text: 소비 전, 잠깐의 초록 멈춤
+        - heading "사기 전에 한 번 더, 생각해요." [level=1] [ref=e24]:
+          - text: 사기 전에
+          - emphasis [ref=e25]: 한 번 더,
+          - text: 생각해요.
+        - paragraph [ref=e26]:
+          - text: 사고 싶은 물건을 알려주면
+          - text: 내 지갑과 지구에 어떤 선택인지 함께 살펴볼게요.
+        - link "내 소비 점검하기 →" [ref=e27] [cursor=pointer]:
+          - /url: "#analyze"
+          - text: 내 소비 점검하기
+          - generic [ref=e28]: →
+        - generic [ref=e29]:
+          - generic [ref=e30]: ✓
+          - text: 가입 없이 바로 시작할 수 있어요
+      - generic "지구를 생각하는 소비를 표현한 일러스트" [ref=e31]:
+        - generic [ref=e37]:
+          - generic [ref=e38]: ⌣
+          - generic [ref=e41]: ❧
+        - generic [ref=e42]:
+          - generic [ref=e43]: ₩
+          - generic [ref=e44]:
+            - generic [ref=e45]: 이번 달 절약
+            - strong [ref=e46]: 32,000원
+          - generic [ref=e47]: ↗
+        - generic [ref=e48]:
+          - generic [ref=e49]: ♧
+          - generic [ref=e50]:
+            - generic [ref=e51]: 환경 점수
+            - strong [ref=e52]: 좋음 +12
+        - generic [ref=e53]: ✦
+        - generic [ref=e54]: ✧
+    - region "서비스가 분석하는 항목" [ref=e55]:
+      - generic [ref=e56]: greenchoice는 이렇게 살펴봐요
+      - generic [ref=e58]: 필요성
+      - generic [ref=e59]: 예산 부담
+      - generic [ref=e60]: 기회비용
+      - generic [ref=e61]: 탄소발자국
+    - generic [ref=e62]:
+      - generic [ref=e63]: HOW IT WORKS
+      - generic [ref=e64]:
+        - heading "소비에도 잠깐의 여유가 필요하니까." [level=2] [ref=e65]:
+          - text: 소비에도
+          - text: 잠깐의 여유가 필요하니까.
+        - paragraph [ref=e66]:
+          - text: 정답을 대신 고르는 대신,
+          - text: 더 나은 결정을 내릴 수 있게 도와드려요.
+      - generic [ref=e67]:
+        - article [ref=e68]:
+          - generic [ref=e69]: "01"
+          - generic [ref=e70]: ⌕
+          - heading "사고 싶은 물건을 입력해요" [level=3] [ref=e71]:
+            - text: 사고 싶은 물건을
+            - text: 입력해요
+          - paragraph [ref=e72]:
+            - text: 가격과 구매 이유를
+            - text: 간단히 알려주세요.
+        - article [ref=e73]:
+          - generic [ref=e74]: "02"
+          - generic [ref=e75]: ✦
+          - heading "여러 기준으로 함께 살펴봐요" [level=3] [ref=e76]:
+            - text: 여러 기준으로
+            - text: 함께 살펴봐요
+          - paragraph [ref=e77]:
+            - text: 필요성부터 탄소발자국까지
+            - text: 꼼꼼하게 분석해요.
+        - article [ref=e78]:
+          - generic [ref=e79]: "03"
+          - generic [ref=e80]: ♧
+          - heading "나에게 맞는 선택을 찾아요" [level=3] [ref=e81]:
+            - text: 나에게 맞는
+            - text: 선택을 찾아요
+          - paragraph [ref=e82]:
+            - text: 대체 방법과 작은 실천까지
+            - text: 추천해드려요.
+    - generic [ref=e83]:
+      - generic [ref=e84]:
+        - generic [ref=e85]:
+          - generic [ref=e86]: LET'S CHECK
+          - heading "무엇을 살까 고민하고 있나요?" [level=2] [ref=e87]:
+            - text: 무엇을 살까
+            - text: 고민하고 있나요?
+        - generic [ref=e88]:
+          - generic [ref=e89]: ●
+          - paragraph [ref=e90]:
+            - text: 천천히 적어도 괜찮아요.
+            - text: 같이 살펴볼게요!
+      - group "사용자 모드 선택" [ref=e91]:
+        - button "청소년 모드 가볍고 쉽게" [ref=e92] [cursor=pointer]
+        - button "성인 모드 조금 더 자세히" [ref=e93] [cursor=pointer]
+      - generic [ref=e94]:
+        - generic [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e97]: 무엇을 사고 싶나요? 필수
+            - generic [ref=e98]:
+              - generic [ref=e99]: ⌕
+              - textbox "무엇을 사고 싶나요? 필수" [ref=e100]:
+                - /placeholder: "예: 무선 이어폰, 운동화, 텀블러"
+            - paragraph [ref=e101]: 제품 이름이나 사고 싶은 물건을 적어주세요.
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - generic [ref=e104]: 예상 가격 필수
+              - generic [ref=e105]:
+                - spinbutton "예상 가격 필수" [ref=e106]
+                - generic [ref=e107]: 원
+            - generic [ref=e108]:
+              - generic [ref=e109]: 이번 달 쓸 수 있는 돈
+              - generic [ref=e110]:
+                - spinbutton "이번 달 쓸 수 있는 돈" [ref=e111]
+                - generic [ref=e112]: 원
+          - generic [ref=e113]:
+            - generic [ref=e114]: 구매 목적은 무엇인가요? 필수
+            - generic [ref=e115]:
+              - generic [ref=e117] [cursor=pointer]: 필수품
+              - generic [ref=e119] [cursor=pointer]: 취미·덕질
+              - generic [ref=e121] [cursor=pointer]: 선물
+              - generic [ref=e123] [cursor=pointer]: 충동적 지적 욕구
+              - generic [ref=e125] [cursor=pointer]: 스트레스 해소
+              - generic [ref=e127] [cursor=pointer]: 기타
+          - generic [ref=e128]:
+            - generic [ref=e129]: 얼마나 자주 사용할 것 같나요? 필수
+            - combobox "얼마나 자주 사용할 것 같나요? 필수" [ref=e130]:
+              - option "매일" [selected]
+              - option "주 1~2회"
+              - option "가끔"
+              - option "이벤트성"
+          - generic [ref=e131]:
+            - generic [ref=e132]:
+              - generic [ref=e133]: 비슷한 역할을 하는 물건을 이미 갖고 있나요?
+              - generic [ref=e134]:
+                - generic [ref=e136] [cursor=pointer]: 예
+                - generic [ref=e138] [cursor=pointer]: 아니오
+            - generic [ref=e139]:
+              - generic [ref=e140]: 중고나 리사이클 제품도 고려할 의향이 있나요?
+              - generic [ref=e141]:
+                - generic [ref=e143] [cursor=pointer]: 예
+                - generic [ref=e145] [cursor=pointer]: 아니오
+          - button "AI 합리성 & 환경 영향 분석하기 ✦" [ref=e146] [cursor=pointer]:
+            - text: AI 합리성 & 환경 영향 분석하기
+            - generic [ref=e147]: ✦
+        - complementary [ref=e148]:
+          - generic [ref=e150]: ♧
+          - generic [ref=e153]:
+            - generic [ref=e154]: 작은 질문 하나가
+            - strong [ref=e155]:
+              - text: 더 좋은 소비를
+              - text: 만들 수 있어요.
+            - paragraph [ref=e156]:
+              - text: 입력한 정보는 분석 결과를
+              - text: 만드는 데만 사용돼요.
+    - generic [ref=e157]:
+      - generic [ref=e158]: “
+      - paragraph [ref=e159]:
+        - text: 좋은 소비는
+        - emphasis [ref=e160]: 나를 아끼는 일
+        - text: 이자
+        - text: 지구를 아끼는 일이에요.
+      - generic [ref=e161]: — greenchoice team
+  - contentinfo [ref=e162]:
+    - generic [ref=e163]:
+      - generic [ref=e164]: ✦
+      - generic [ref=e165]: greenchoice
+    - paragraph [ref=e166]: 합리적 소비 & 친환경 습관 도우미
+    - generic [ref=e167]: © 2026 ROOTPIE

@@ -1,0 +1,130 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "기획서 맨 위로" [ref=e4] [cursor=pointer]:
+        - /url: "#top"
+        - generic [ref=e5]: R
+        - generic [ref=e6]: ROOTPIE
+      - generic [ref=e7]:
+        - generic [ref=e9]: PROJECT BRIEF · 2026
+        - button "인쇄하기" [ref=e10] [cursor=pointer]:
+          - img [ref=e11]
+          - text: 인쇄하기
+  - main [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]: SERVICE PLANNING DOCUMENT
+      - heading "기획서" [level=1] [ref=e17]
+      - paragraph [ref=e18]:
+        - text: 사기 전에 한 번 더 생각하는 습관.
+        - text: 청소년의 더 나은 소비를 돕는 루트파이의 서비스 설계안입니다.
+    - region "프로젝트 기본 정보" [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: 프로젝트 이름
+        - strong [ref=e22]:
+          - text: 청소년의 친환경 소비를 위한
+          - text: 소비 습관 관리 및 친환경 소비 추천 앱
+      - generic [ref=e23]:
+        - generic [ref=e24]: 팀 이름
+        - strong [ref=e25]: 루트파이
+      - generic [ref=e26]:
+        - generic [ref=e27]: 팀원
+        - strong [ref=e28]:
+          - text: 유재현 · 김찬우 · 김윤기
+          - text: 박건우 · 이진호
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: "01"
+        - heading "무엇을 만들까" [level=2] [ref=e32]
+      - generic [ref=e34]:
+        - article [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: A
+            - heading "사용자와 상황" [level=3] [ref=e38]
+          - generic [ref=e39]:
+            - paragraph [ref=e40]: 주 사용자는 청소년입니다. 필요한 물품이 생겨 구매를 고민하는 순간, 자신의 소비를 점검하기 위해 사용합니다.
+            - generic [ref=e41]: 누가, 어떤 상황에서 쓰나요?
+        - article [ref=e42]:
+          - generic [ref=e43]:
+            - generic [ref=e44]: B
+            - heading "문제" [level=3] [ref=e45]
+          - generic [ref=e46]:
+            - paragraph [ref=e47]: 청소년은 제품을 구매할 때 그것이 정말 필요한지, 단순히 사고 싶은 마음인지, 지금 구매하는 것이 적절한지 판단하기 어렵습니다.
+            - paragraph [ref=e48]: 그 결과 광고나 유튜브를 보고 충동적으로 구매하거나, 경제 상황을 고려하지 않은 불필요한 소비를 하며, 구매 후에도 제품을 자주 사용하지 않게 됩니다.
+            - generic [ref=e49]: 그 사람이 겪는 불편을 한 줄로
+        - article [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]: C
+            - heading "해결 방법" [level=3] [ref=e53]
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: 사용자가 입력한 사용 빈도, 제품 품목, 예산, 구매 목적과 필요성, 구매 시급성을 AI가 분석합니다. 분석 결과를 바탕으로 현재 구매가 적합한지 판단하고 더 나은 소비 선택을 안내합니다.
+            - generic [ref=e56]: 무엇을 하면 그 불편이 줄어드나요?
+        - article [ref=e57]:
+          - generic [ref=e58]:
+            - generic [ref=e59]: D
+            - heading "제품" [level=3] [ref=e60]
+          - generic [ref=e61]:
+            - paragraph [ref=e62]: 청소년의 구매 전 판단을 돕는 소비 습관 관리 및 친환경 소비 추천 웹앱
+            - generic [ref=e63]: 만들 것을 한 줄로
+    - generic [ref=e64]:
+      - generic [ref=e65]:
+        - generic [ref=e66]: "02"
+        - heading "어디까지 만들까" [level=2] [ref=e67]
+      - generic [ref=e69]:
+        - article [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]: A
+            - heading "요구사항" [level=3] [ref=e73]
+          - generic [ref=e74]:
+            - paragraph [ref=e75]:
+              - generic [ref=e76]: "01"
+              - text: AI가 사용자가 입력한 제품의 정보를 분석한 뒤 제품의 주요 정보와 구매 판단에 필요한 내용을 알려줍니다.
+            - paragraph [ref=e77]:
+              - generic [ref=e78]: "02"
+              - text: AI가 사용자의 예산과 구매 목적을 분석해 합리적인 대체 상품이나 소비 방법을 제안합니다.
+            - paragraph [ref=e79]:
+              - generic [ref=e80]: "03"
+              - text: AI가 구매하려는 제품의 환경 영향을 분석하고 탄소 배출을 줄일 수 있는 친환경 소비 방법을 알려줍니다.
+            - generic [ref=e81]: AI가 구현해야 할 행동과 결과
+        - article [ref=e82]:
+          - generic [ref=e83]:
+            - generic [ref=e84]: B
+            - heading "검증 조건" [level=3] [ref=e85]
+          - generic [ref=e86]:
+            - paragraph [ref=e87]:
+              - generic [ref=e88]: "01"
+              - text: 제시한 상품을 구매하기에 적합한지 부적합한지의 여부가 명확히 표시됩니다.
+            - paragraph [ref=e89]:
+              - generic [ref=e90]: "02"
+              - text: 구매 적합·비적합을 판단한 이유와 과정, 근거를 사용자가 이해할 수 있게 확인할 수 있습니다.
+            - paragraph [ref=e91]:
+              - generic [ref=e92]: "03"
+              - text: 시스템 사용으로 절약한 탄소·에너지 등 환경에 준 도움을 확인할 수 있습니다.
+            - generic [ref=e93]: 실행해 보고 확인할 수 있는 조건
+        - article [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]: C
+            - heading "데이터" [level=3] [ref=e97]
+          - generic [ref=e98]:
+            - paragraph [ref=e99]: 청소년 구매 금지 품목, 구매 품목의 실제 시장 데이터, 청소년 유해 약물, 청소년 보호법, 사용자 소비 기록 및 리워드(뱃지) 정보
+            - generic [ref=e100]: 저장할 정보 한 줄
+        - article [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]: D
+            - heading "개발 범위" [level=3] [ref=e104]
+          - generic [ref=e105]:
+            - generic [ref=e106]:
+              - generic [ref=e107]: 포함
+              - paragraph [ref=e108]: 상품 최저가 검색을 위한 외부 API 연동, 사용자 소비 데이터 및 리워드(뱃지) 시스템 DB 구축
+            - generic [ref=e109]:
+              - generic [ref=e110]: 제외
+              - paragraph [ref=e111]: 실제 전자상거래 결제 시스템 연동, 유저 간 커뮤니티 및 소셜 네트워킹 기능
+            - generic [ref=e112]:
+              - generic [ref=e113]: 제외 사유
+              - paragraph [ref=e114]: 서비스의 초점은 실제 전자상거래가 아니라 결제 전 한 번 더 재검토하도록 돕는 것입니다. 커뮤니티 기능은 개발 규모가 커 핵심 문제인 개인 소비 분석과 뱃지 보상 기능의 완성도를 떨어뜨릴 수 있어 제외합니다.
+            - generic [ref=e115]: 포함할 것과 제외할 것
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - generic [ref=e118]: R
+        - generic [ref=e119]: 루트파이
+      - paragraph [ref=e120]: 사기 전, 나와 지구를 위한 선택을 확인합니다.
+      - generic [ref=e121]: 01 / 01
