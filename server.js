@@ -10,7 +10,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const resendApiKey = process.env.RESEND_API_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const signupWindows = new Map();
-const privacyPolicyVersion = '1.0';
+const privacyPolicyVersion = '1.1';
 const requiredKeys = ['necessity_score', 'necessity_reason', 'opportunity_cost', 'budget_impact', 'eco_impact', 'smart_alternatives', 'final_verdict', 'final_verdict_reason', 'encouragement_quote'];
 
 const systemPrompt = `너는 합리적 소비를 돕는 친환경 소비 분석 엔진이다. 사용자가 보낸 구매 정보를 분석한다.

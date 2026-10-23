@@ -3,7 +3,19 @@ const loggedInActions = document.querySelector('#loggedInActions');
 const loginButton = document.querySelector('#loginButton');
 const signupButton = document.querySelector('#signupButton');
 const historyButton = document.querySelector('#historyButton');
+const ledgerButton = document.querySelector('#ledgerButton');
 const historyModal = document.querySelector('#historyModal');
+const ledgerModal = document.querySelector('#ledgerModal');
+const ledgerForm = document.querySelector('#ledgerForm');
+const ledgerBalance = document.querySelector('#ledgerBalance');
+const ledgerBalanceCaption = document.querySelector('#ledgerBalanceCaption');
+const ledgerWarning = document.querySelector('#ledgerWarning');
+const ledgerIncomeTotal = document.querySelector('#ledgerIncomeTotal');
+const ledgerExpenseTotal = document.querySelector('#ledgerExpenseTotal');
+const ledgerEntries = document.querySelector('#ledgerEntries');
+const ledgerEntryCount = document.querySelector('#ledgerEntryCount');
+const ledgerMessage = document.querySelector('#ledgerMessage');
+const ledgerSyncNotice = document.querySelector('#ledgerSyncNotice');
 const historyList = document.querySelector('#historyList');
 const historyDetailModal = document.querySelector('#historyDetailModal');
 const historyDetailCopy = document.querySelector('#historyDetailCopy');
@@ -41,11 +53,15 @@ const authMessage = document.querySelector('#authMessage');
 const authSubmit = document.querySelector('#authSubmit');
 const privacyConsentField = document.querySelector('#privacyConsentField');
 const privacyConsent = document.querySelector('#privacyConsent');
+const privacyModal = document.querySelector('#privacyModal');
+const privacyAcceptLedger = document.querySelector('#privacyAcceptLedger');
+const privacyAcceptMessage = document.querySelector('#privacyAcceptMessage');
 const authTitle = document.querySelector('#authTitle');
 let supabaseClient = null;
 let supabaseSetupMessage = 'Supabase 연결 상태를 확인하고 있어요.';
 let supabaseReadyPromise = null;
 let currentUser = null;
+let ledgerUsesLocalStorage = false;
 let authMode = 'login';
 let pendingResult = null;
 let pendingInput = null;
@@ -111,10 +127,39 @@ function openAuth(nextMode = 'login') { setAuthMode(nextMode); openModal(authMod
 loginButton.addEventListener('click', () => openAuth('login'));
 signupButton.addEventListener('click', () => openAuth('signup'));
 historyButton.addEventListener('click', async () => { openModal(historyModal); await renderHistory(); });
+ledgerButton.addEventListener('click', async () => {
+  if (!currentUser) { openAuth('login'); return; }
+  if (currentUser.user_metadata?.privacy_policy_version !== '1.1') {
+    privacyAcceptLedger.hidden = false;
+    privacyAcceptMessage.textContent = '가계부 이용을 위해 변경된 개인정보처리방침을 확인하고 동의해 주세요.';
+    openModal(privacyModal);
+    return;
+  }
+  openModal(ledgerModal);
+  await renderLedger();
+});
 
 document.querySelectorAll('[data-auth-tab]').forEach((tab) => tab.addEventListener('click', () => setAuthMode(tab.dataset.authTab)));
 document.querySelectorAll('[data-close-modal]').forEach((button) => button.addEventListener('click', () => closeModal(document.querySelector(`#${button.dataset.closeModal}`))));
-document.querySelector('#showPrivacyPolicy').addEventListener('click', () => openModal(document.querySelector('#privacyModal')));
+document.querySelector('#showPrivacyPolicy').addEventListener('click', () => {
+  privacyAcceptLedger.hidden = true;
+  privacyAcceptMessage.textContent = '';
+  openModal(privacyModal);
+});
+
+privacyAcceptLedger.addEventListener('click', async () => {
+  privacyAcceptLedger.disabled = true;
+  privacyAcceptMessage.textContent = '동의 내용을 저장하고 있어요...';
+  const { data, error } = await supabaseClient.auth.updateUser({ data: { privacy_consent: true, privacy_policy_version: '1.1', privacy_consented_at: new Date().toISOString() } });
+  privacyAcceptLedger.disabled = false;
+  if (error || !data.user) { privacyAcceptMessage.textContent = '동의를 저장하지 못했어요. 다시 시도해 주세요.'; return; }
+  currentUser = data.user;
+  privacyAcceptLedger.hidden = true;
+  privacyAcceptMessage.textContent = '';
+  closeModal(privacyModal);
+  openModal(ledgerModal);
+  await renderLedger();
+});
 
 authForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -216,9 +261,11 @@ async function updateRecordStatus(record, status) {
     const key = `greenchoice_history_${currentUser.id}`;
     const history = JSON.parse(localStorage.getItem(key) || '[]').map((item) => String(item.id) === String(record.id) ? { ...item, status } : item);
     localStorage.setItem(key, JSON.stringify(history));
+    if (!ledgerModal.hidden) await renderLedger();
     return true;
   }
   const response = await supabaseClient.from('analysis_records').update({ status }).eq('id', record.id).eq('user_id', currentUser.id);
+  if (!response.error && !ledgerModal.hidden) await renderLedger();
   return !response.error;
 }
 
@@ -248,6 +295,7 @@ document.querySelectorAll('[data-detail-status]').forEach((button) => button.add
   await supabaseClient.from('analysis_records').update({ status }).eq('id', currentReminderRecord.id).eq('user_id', currentUser.id);
   historyDetailMessage.textContent = status === 'skipped' ? '잘했어요. 구매하지 않기로 한 기록을 저장했어요.' : '지금도 필요한 물건이라면 오래 사용할 방법도 함께 생각해보세요.';
   currentReminderRecord.status = status;
+  if (!ledgerModal.hidden) await renderLedger();
   setTimeout(() => closeModal(historyDetailModal), 900);
 }));
 
@@ -331,6 +379,115 @@ async function fetchHistory() {
   return JSON.parse(localStorage.getItem(`greenchoice_history_${currentUser.id}`) || '[]');
 }
 
+function localLedgerTransactions() {
+  return JSON.parse(localStorage.getItem(`greenchoice_ledger_${currentUser.id}`) || '[]');
+}
+
+async function fetchLedgerTransactions() {
+  const cached = localLedgerTransactions();
+  if (supabaseClient) {
+    const response = await supabaseClient.from('ledger_transactions').select('id,user_id,transaction_type,amount,description,created_at').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+    if (!response.error && Array.isArray(response.data)) {
+      const localOnly = cached.filter((transaction) => String(transaction.id).startsWith('local-'));
+      if (localOnly.length) {
+        const migrated = await supabaseClient.from('ledger_transactions').insert(localOnly.map((transaction) => ({ user_id: currentUser.id, transaction_type: transaction.transaction_type, amount: transaction.amount, description: transaction.description, created_at: transaction.created_at }))).select('id,user_id,transaction_type,amount,description,created_at');
+        if (!migrated.error && Array.isArray(migrated.data)) {
+          localStorage.setItem(`greenchoice_ledger_${currentUser.id}`, JSON.stringify(cached.filter((transaction) => !String(transaction.id).startsWith('local-'))));
+          ledgerUsesLocalStorage = false;
+          return [...response.data, ...migrated.data];
+        }
+      }
+      ledgerUsesLocalStorage = localOnly.length > 0;
+      return [...response.data, ...localOnly];
+    }
+  }
+  ledgerUsesLocalStorage = true;
+  return cached;
+}
+
+async function renderLedger() {
+  if (!currentUser) return;
+  const [history, transactions] = await Promise.all([fetchHistory(), fetchLedgerTransactions()]);
+  const purchases = history
+    .filter((record) => record.status === 'purchased' || record.status === 'secondhand')
+    .map((record) => {
+      const input = record.input_data || record.input || {};
+      return { id: `purchase-${record.id}`, transaction_type: 'expense', amount: Number(input.price) || 0, description: `${input.item || '소비 기록'} 구매`, created_at: record.created_at || record.savedAt, source: 'purchase' };
+    });
+  const entries = [...transactions, ...purchases].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+  const income = transactions.filter((transaction) => transaction.transaction_type === 'income').reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+  const manualExpense = transactions.filter((transaction) => transaction.transaction_type === 'expense').reduce((sum, transaction) => sum + Number(transaction.amount || 0), 0);
+  const purchaseExpense = purchases.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const expense = manualExpense + purchaseExpense;
+  const balance = income - expense;
+  const lowBalance = balance <= 0 || (income > 0 && balance <= income * .1);
+  const formatMoney = (amount) => `${Math.round(amount).toLocaleString('ko-KR')}원`;
+
+  ledgerBalance.textContent = formatMoney(balance);
+  ledgerBalance.classList.toggle('is-low', lowBalance);
+  ledgerIncomeTotal.textContent = `+${formatMoney(income)}`;
+  ledgerExpenseTotal.textContent = `-${formatMoney(expense)}`;
+  ledgerBalanceCaption.textContent = income ? `수입 ${formatMoney(income)}에서 지출 ${formatMoney(expense)}을 뺀 금액이에요.` : '현재 가진 돈을 먼저 들어온 금액으로 등록해 주세요.';
+  ledgerWarning.hidden = !lowBalance;
+  ledgerWarning.textContent = balance < 0
+    ? `지출이 등록된 수입보다 ${formatMoney(Math.abs(balance))} 많아요. 지출 내역을 확인해 주세요.`
+    : income > 0
+      ? '남은 금액이 총 수입의 10% 이하예요. 남은 지출을 확인해 주세요.'
+      : '현재 보유 금액이 0원이에요. 가진 금액을 수입으로 등록해 주세요.';
+  ledgerSyncNotice.hidden = !ledgerUsesLocalStorage;
+  ledgerSyncNotice.textContent = '가계부 표에 연결되지 않아 이 기기에 임시 저장 중이에요. Supabase에 ledger_transactions 표를 추가하면 계정에 저장됩니다.';
+  ledgerEntryCount.textContent = `${entries.length}건`;
+  ledgerEntries.replaceChildren();
+  if (!entries.length) {
+    ledgerEntries.append(makeTextElement('p', 'ledger-empty', '아직 기록이 없어요. 첫 수입이나 지출을 입력해 보세요.'));
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const isIncome = entry.transaction_type === 'income';
+    const row = document.createElement('article'); row.className = `ledger-entry ${isIncome ? 'ledger-entry-income' : 'ledger-entry-expense'}`;
+    const copy = document.createElement('div'); copy.className = 'ledger-entry-copy';
+    copy.append(makeTextElement('strong', '', entry.description || (entry.source === 'purchase' ? '소비 기록 구매' : '내역')));
+    const date = entry.created_at ? new Date(entry.created_at) : new Date();
+    copy.append(makeTextElement('span', '', `${date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}${entry.source === 'purchase' ? ' · 소비 기록' : ''}`));
+    row.append(copy, makeTextElement('strong', 'ledger-entry-amount', `${isIncome ? '+' : '-'}${formatMoney(Number(entry.amount) || 0)}`));
+    ledgerEntries.append(row);
+  });
+}
+
+ledgerForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!currentUser) return;
+  const transactionType = document.querySelector('#ledgerType').value;
+  const amount = Number(document.querySelector('#ledgerAmount').value);
+  const description = document.querySelector('#ledgerDescription').value.trim();
+  if (!Number.isFinite(amount) || amount <= 0 || !description) return;
+  const transaction = { id: `local-${Date.now()}`, user_id: currentUser.id, transaction_type: transactionType, amount, description, created_at: new Date().toISOString() };
+  const submit = ledgerForm.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  ledgerMessage.textContent = '내역을 저장하고 있어요...';
+
+  if (supabaseClient) {
+    const response = await supabaseClient.from('ledger_transactions').insert({ user_id: currentUser.id, transaction_type: transactionType, amount, description }).select('id,user_id,transaction_type,amount,description,created_at').single();
+    if (!response.error && response.data) {
+      ledgerMessage.textContent = '내역을 저장했어요.';
+      submit.disabled = false;
+      ledgerForm.reset();
+      await renderLedger();
+      return;
+    }
+  }
+
+  const cached = localLedgerTransactions();
+  cached.unshift(transaction);
+  localStorage.setItem(`greenchoice_ledger_${currentUser.id}`, JSON.stringify(cached));
+  ledgerUsesLocalStorage = true;
+  ledgerMessage.textContent = '내역을 이 기기에 임시 저장했어요.';
+  submit.disabled = false;
+  ledgerForm.reset();
+  await renderLedger();
+});
+
 async function renderHistory() {
   historyList.replaceChildren();
   if (!currentUser) return;
@@ -372,6 +529,7 @@ historyList.addEventListener('click', async (event) => {
     await supabaseClient.from('analysis_records').update({ status }).eq('id', id).eq('user_id', currentUser.id);
   }
   await renderHistory();
+  if (!ledgerModal.hidden) await renderLedger();
 });
 
 function openSavePrompt(result, input) { pendingResult = result; pendingInput = input; openModal(savePrompt); }

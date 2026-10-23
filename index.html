@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="privacy.css" />
   <link rel="stylesheet" href="analysis.css" />
+  <link rel="stylesheet" href="ledger.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
@@ -23,7 +24,7 @@
         <a href="#analyze">소비 분석</a>
         <a href="#my-space">나의 공간</a>
       </nav>
-      <div class="account-area"><div class="logged-out-actions" id="loggedOutActions"><button type="button" class="header-auth-button" id="loginButton">로그인</button><button type="button" class="header-auth-button filled" id="signupButton">회원가입</button></div><div class="logged-in-actions" id="loggedInActions" hidden><span class="header-user-email" id="accountEmail"></span><span class="header-badge" id="badgeCount">0개 뱃지</span><button type="button" class="header-action-button" id="historyButton">사용 기록</button><button type="button" class="header-action-button logout" id="logoutButton">로그아웃</button></div></div>
+      <div class="account-area"><div class="logged-out-actions" id="loggedOutActions"><button type="button" class="header-auth-button" id="loginButton">로그인</button><button type="button" class="header-auth-button filled" id="signupButton">회원가입</button></div><div class="logged-in-actions" id="loggedInActions" hidden><span class="header-user-email" id="accountEmail"></span><span class="header-badge" id="badgeCount">0개 뱃지</span><button type="button" class="header-action-button" id="historyButton">사용 기록</button><button type="button" class="header-action-button" id="ledgerButton">가계부</button><button type="button" class="header-action-button logout" id="logoutButton">로그아웃</button></div></div>
     </div>
   </header>
 
@@ -106,17 +107,18 @@
       <button class="modal-close" type="button" data-close-modal="privacyModal" aria-label="개인정보처리방침 닫기">×</button>
       <div class="section-kicker">GREENCHOICE · PRIVACY</div>
       <h2 id="privacyTitle">개인정보처리방침</h2>
-      <p class="privacy-version">시행일: 2026년 10월 23일 · 버전 1.0</p>
+        <p class="privacy-version">시행일: 2026년 10월 23일 · 버전 1.1</p>
       <div class="privacy-content">
         <p>greenchoice는 회원가입, 소비 분석 기록 저장, 이메일 확인을 위해 필요한 개인정보를 처리합니다.</p>
         <section><h3>1. 수집하는 정보</h3><ul>
           <li>회원가입: 이메일 주소, 비밀번호</li>
           <li>동의 기록: 동의 여부, 정책 버전, 동의 시각</li>
           <li>소비 분석: 물건 이름, 가격, 예산, 구매 목적, 사용 빈도, 비슷한 물건 보유 여부, 중고 고려 여부와 분석 결과</li>
+          <li>가계부: 수입·지출 구분, 금액, 내역, 기록 시각</li>
           <li>리마인드 이용 시: 이메일 주소, 물건 이름, 가격, 알림 예정 시각</li>
         </ul></section>
-        <section><h3>2. 이용 목적</h3><p>계정 생성과 로그인, 가입 이메일 확인, 소비 분석 결과 및 이용 기록 제공, 요청한 리마인드 이메일 발송에 이용합니다.</p></section>
-        <section><h3>3. 보관 및 브라우저 저장</h3><p>계정과 분석 기록은 서비스 제공을 위해 Supabase에 저장됩니다. 일부 기록과 뱃지 정보는 편의를 위해 로그인한 기기의 브라우저 저장소에도 보관될 수 있습니다. 구체적인 보유 기간과 삭제 요청 연락처는 서비스 운영 전에 운영자가 확정해야 합니다.</p></section>
+        <section><h3>2. 이용 목적</h3><p>계정 생성과 로그인, 가입 이메일 확인, 소비 분석 및 이용 기록 제공, 가계부 잔액·내역 계산, 요청한 리마인드 이메일 발송에 이용합니다.</p></section>
+        <section><h3>3. 보관 및 브라우저 저장</h3><p>계정, 분석 기록과 가계부 내역은 서비스 제공을 위해 Supabase에 저장됩니다. 일부 기록과 뱃지 정보는 편의를 위해 로그인한 기기의 브라우저 저장소에도 보관될 수 있습니다. 구체적인 보유 기간과 삭제 요청 연락처는 서비스 운영 전에 운영자가 확정해야 합니다.</p></section>
         <section><h3>4. 외부 서비스 처리</h3><ul>
           <li>Supabase: 계정 인증과 소비 기록 저장</li>
           <li>Resend: 가입 확인 및 리마인드 이메일 전송</li>
@@ -126,6 +128,8 @@
         <section><h3>6. 이용자의 권리</h3><p>개인정보 열람·정정·삭제 또는 처리 중지를 요청할 수 있습니다. 운영자 연락처와 요청 처리 절차는 실제 서비스 공개 전에 이 안내에 추가해야 합니다.</p></section>
       </div>
       <p class="privacy-draft-note">이 안내는 현재 웹페이지 기능을 기준으로 작성한 초안입니다. 실제 서비스 운영 전 운영자 정보, 보유 기간, 문의처를 확정해 주세요.</p>
+      <p class="privacy-accept-message" id="privacyAcceptMessage" role="status"></p>
+      <button type="button" class="analyze-button privacy-ledger-accept" id="privacyAcceptLedger" hidden>동의하고 가계부 열기</button>
       <button type="button" class="analyze-button privacy-done" data-close-modal="privacyModal">확인하고 돌아가기</button>
     </section>
   </div>
@@ -133,6 +137,50 @@
   <div class="modal-backdrop" id="historyModal" hidden><section class="history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle"><button class="modal-close" type="button" data-close-modal="historyModal">×</button><div class="section-kicker">MY GREEN RECORD</div><h2 id="historyTitle">내 소비 히스토리<br /><span>&amp; 절약 저금통</span></h2><div class="badge-challenge"><div class="badge-heading"><div><span class="section-kicker">CONSUMPTION CHALLENGE</span><h3>작은 실천이<br /><span>멋진 뱃지</span>가 돼요.</h3></div><span class="badge-progress" id="badgeProgress">0 / 4 획득</span></div><div class="badge-grid" id="badgeGrid"></div></div><div class="dashboard-grid"><div class="dashboard-stat primary"><span>이번 달 총 분석</span><strong id="monthlyAnalyses">0회</strong><small>소비를 점검한 횟수</small></div><div class="dashboard-stat"><span>AI 추천을 따름</span><strong id="aiRecommendedBought">0회</strong><small>추천 후 구매 완료</small></div><div class="dashboard-stat"><span>비추천을 따름</span><strong id="aiFollowedAvoid">0회</strong><small>구매하지 않음</small></div><div class="dashboard-stat warning"><span>비추천인데 구매</span><strong id="aiIgnored">0회</strong><small>AI 가이드와 다른 선택</small></div><div class="dashboard-chart"><div class="chart-heading"><span>구매 목적별 지출 비중</span><small>전체 기록 기준</small></div><div class="donut-wrap"><canvas id="purposeChart" aria-label="구매 목적별 지출 비중 원형 차트"></canvas><div class="donut-center"><strong id="purposeTotal">0원</strong><span>분석 금액</span></div></div><div class="chart-legend" id="purposeLegend"></div></div><div class="dashboard-guide"><div class="chart-heading"><span>AI 가이드 준수율</span><small>추천과 실제 행동 비교</small></div><div class="guide-ring"><div><strong id="guideRate">0%</strong><span>준수율</span></div></div><p id="guideCopy">아직 충분한 기록이 없어요.<br />분석 결과를 저장해보세요.</p></div><div class="dashboard-carbon"><div class="carbon-leaf">♧</div><div><span>AI 가이드로 지킨 환경</span><strong id="carbonTrees">소나무 0그루를 심은 효과</strong><small id="carbonDetail">0kg CO₂ 절감</small></div></div></div><div class="savings-stats"><div><span>누적 절약 저금통</span><strong id="savedMoney">0원</strong></div><div><span>절감된 탄소 배출량</span><strong id="savedCarbon">0kg</strong></div></div><p class="history-intro">각 기록에서 실제 행동을 선택하면 AI 추천 준수율과 환경 효과에 반영돼요.</p><div class="history-list" id="historyList"></div></section></div>
   <div class="modal-backdrop" id="historyDetailModal" hidden><section class="history-detail-modal" role="dialog" aria-modal="true" aria-labelledby="historyDetailTitle"><button class="modal-close" type="button" data-close-modal="historyDetailModal">×</button><div class="section-kicker">COOLING CHECK-IN</div><h2 id="historyDetailTitle">아직도<br /><span>사고 싶나요?</span></h2><p class="history-detail-copy" id="historyDetailCopy"></p><div class="detail-choice-actions"><button type="button" class="detail-choice yes" data-detail-status="purchased">지금도 사고 싶어요</button><button type="button" class="detail-choice no" data-detail-status="skipped">안 사기로 했어요!</button></div><p class="auth-message" id="historyDetailMessage"></p></section></div>
   <div class="modal-backdrop" id="badgeShareModal" hidden><section class="badge-share-modal" role="dialog" aria-modal="true"><button class="modal-close" type="button" data-close-modal="badgeShareModal">×</button><div class="section-kicker">BADGE SHARE</div><h2>나의 소비 뱃지를<br /><span>자랑해보세요.</span></h2><img id="badgeShareImage" class="badge-share-image" alt="획득한 소비 뱃지 공유 이미지" /><p id="badgeShareCopy" class="history-intro"></p><button type="button" class="analyze-button" id="nativeShareButton">SNS로 공유하기 <span>↗</span></button></section></div>
+  <div class="modal-backdrop ledger-backdrop" id="ledgerModal" hidden>
+    <section class="ledger-modal" role="dialog" aria-modal="true" aria-labelledby="ledgerTitle">
+      <button class="modal-close" type="button" data-close-modal="ledgerModal" aria-label="가계부 닫기">×</button>
+      <div class="section-kicker">MY MONEY</div>
+      <h2 id="ledgerTitle">나의 가계부</h2>
+      <section class="ledger-balance-card" aria-live="polite">
+        <span>현재 보유 금액</span>
+        <strong id="ledgerBalance">0원</strong>
+        <p id="ledgerBalanceCaption">수입과 지출 기록을 더해 계산해요.</p>
+      </section>
+      <p class="ledger-threshold-note">잔액이 총 수입의 10% 이하이거나 0원 이하가 되면 경고합니다.</p>
+      <div class="ledger-warning" id="ledgerWarning" role="status" hidden></div>
+      <div class="ledger-totals">
+        <div><span>들어온 금액</span><strong id="ledgerIncomeTotal">+0원</strong></div>
+        <div><span>나간 금액</span><strong id="ledgerExpenseTotal">-0원</strong></div>
+      </div>
+      <form class="ledger-form" id="ledgerForm">
+        <h3>금액 기록하기</h3>
+        <div class="ledger-form-row">
+          <label for="ledgerType">구분</label>
+          <select id="ledgerType" name="transactionType">
+            <option value="income">들어온 금액</option>
+            <option value="expense">빠져나간 금액</option>
+          </select>
+        </div>
+        <div class="ledger-form-row">
+          <label for="ledgerAmount">금액</label>
+          <div class="input-unit"><input id="ledgerAmount" name="amount" type="number" min="1" step="1" placeholder="0" required /><span>원</span></div>
+        </div>
+        <div class="ledger-form-row">
+          <label for="ledgerDescription">내역</label>
+          <input id="ledgerDescription" name="description" type="text" maxlength="80" placeholder="예: 용돈, 교통비" required />
+        </div>
+        <button class="ledger-submit" type="submit">내역 추가하기</button>
+        <p class="ledger-form-note">처음에는 현재 가진 돈을 ‘들어온 금액’으로 입력하세요. 소비 기록에서 구매한 항목은 자동으로 지출에 포함되니 중복 입력하지 않아도 돼요.</p>
+        <p class="ledger-message" id="ledgerMessage" role="status"></p>
+      </form>
+      <section class="ledger-history-section">
+        <div class="ledger-history-heading"><h3>수입·지출 내역</h3><span id="ledgerEntryCount">0건</span></div>
+        <div class="ledger-entries" id="ledgerEntries"><p class="ledger-empty">내역을 불러오는 중이에요.</p></div>
+      </section>
+      <p class="ledger-sync-notice" id="ledgerSyncNotice" hidden></p>
+    </section>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
