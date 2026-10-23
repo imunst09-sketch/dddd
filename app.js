@@ -182,16 +182,25 @@ document.querySelectorAll('input[name="reason"]').forEach((input) => input.addEv
 function showError(message) { analysisResult.innerHTML = `<div class="result-error"><span>!</span><div><strong>분석을 잠시 멈췄어요.</strong><p>${message}</p></div></div>`; analysisResult.classList.add('visible'); analysisResult.setAttribute('aria-hidden', 'false'); }
 function makeTextElement(tag, className, text) { const element = document.createElement(tag); element.className = className; element.textContent = text || '-'; return element; }
 
-function renderAnalysis(result) {
+function renderAnalysis(result, input) {
   analysisResult.replaceChildren();
   const header = document.createElement('div'); header.className = 'result-header'; header.append(makeTextElement('div', 'result-badge', result.demo ? 'GREENCHOICE DEMO ANALYSIS' : 'GREENCHOICE AI ANALYSIS'), makeTextElement('h3', '', '나와 지구를 위한 소비 리포트'));
+  const summary = document.createElement('div'); summary.className = 'analysis-summary';
+  summary.append(makeTextElement('span', 'result-label', '입력한 소비 정보'), makeTextElement('strong', 'summary-item', input.item));
+  [[`${Number(input.price).toLocaleString('ko-KR')}원`, 'summary-price'], [input.purpose || '구매 목적 미입력', ''], [input.frequency || '사용 빈도 미입력', ''], [`비슷한 물건 ${input.hasSimilarItem === '예' ? '있음' : '없음'}`, '']].forEach(([text, className]) => summary.append(makeTextElement('span', className, text)));
   const overview = document.createElement('div'); overview.className = 'result-overview';
   const necessity = document.createElement('div'); necessity.className = `result-hero necessity-${result.necessity_score}`; necessity.append(makeTextElement('span', 'result-label', '필요성 판단'), makeTextElement('strong', '', result.necessity_score), makeTextElement('p', '', result.necessity_reason));
-  const verdict = document.createElement('div'); verdict.className = 'verdict-box'; verdict.append(makeTextElement('span', 'result-label', '최종 제안'), makeTextElement('strong', '', result.final_verdict), makeTextElement('p', '', result.encouragement_quote)); overview.append(necessity, verdict);
+  const verdict = document.createElement('div'); verdict.className = 'verdict-box'; verdict.append(makeTextElement('span', 'result-label', '최종 제안'), makeTextElement('strong', '', result.final_verdict), makeTextElement('p', 'verdict-reason', result.final_verdict_reason), makeTextElement('p', 'verdict-encouragement', result.encouragement_quote)); overview.append(necessity, verdict);
   const grid = document.createElement('div'); grid.className = 'result-grid';
-  [['기회비용', result.opportunity_cost, 'opportunity-card'], ['예산 영향', result.budget_impact, 'budget-card'], [`환경 영향 · ${result.eco_impact?.level || '-'}`, result.eco_impact?.eco_tip, 'eco-card-result']].forEach(([title, text, className]) => { const card = document.createElement('article'); card.className = `result-detail-card ${className}`; card.append(makeTextElement('span', 'result-label', title), makeTextElement('p', '', text)); grid.append(card); });
-  const alternatives = document.createElement('article'); alternatives.className = 'alternatives-card'; alternatives.append(makeTextElement('span', 'result-label', '더 나은 선택 아이디어'), makeTextElement('h4', '', '이렇게도 소비할 수 있어요')); const list = document.createElement('ul'); (Array.isArray(result.smart_alternatives) ? result.smart_alternatives : []).forEach((item) => { const li = document.createElement('li'); li.textContent = item; list.append(li); }); alternatives.append(list);
-  analysisResult.append(header, overview, grid, alternatives); analysisResult.classList.add('visible'); analysisResult.setAttribute('aria-hidden', 'false');
+  const opportunity = document.createElement('article'); opportunity.className = 'result-detail-card opportunity-card'; opportunity.append(makeTextElement('span', 'result-label', '기회비용'), makeTextElement('p', '', result.opportunity_cost));
+  const budget = document.createElement('article'); budget.className = 'result-detail-card budget-card';
+  const budgetRatio = input.budget ? `${Math.round((Number(input.price) / Number(input.budget)) * 100)}%` : '예산 미입력';
+  budget.append(makeTextElement('span', 'result-label', '예산 영향'), makeTextElement('strong', 'budget-ratio', budgetRatio), makeTextElement('p', '', result.budget_impact));
+  const environment = document.createElement('article'); environment.className = 'result-detail-card eco-card-result';
+  environment.append(makeTextElement('span', 'result-label', '환경 영향'), makeTextElement('strong', 'eco-level', result.eco_impact.level), makeTextElement('p', 'eco-reason', result.eco_impact.reason), makeTextElement('p', 'eco-tip', `실천 팁 · ${result.eco_impact.eco_tip}`));
+  grid.append(opportunity, budget, environment);
+  const alternatives = document.createElement('article'); alternatives.className = 'alternatives-card'; alternatives.append(makeTextElement('span', 'result-label', '더 나은 선택 아이디어'), makeTextElement('h4', '', '비교해볼 대안')); const list = document.createElement('ul'); result.smart_alternatives.forEach((item) => { const li = document.createElement('li'); li.textContent = item; list.append(li); }); alternatives.append(list);
+  analysisResult.append(header, summary, overview, grid, alternatives); analysisResult.classList.add('visible'); analysisResult.setAttribute('aria-hidden', 'false');
 }
 
 function renderReminderAction(result, input, record) {
@@ -384,7 +393,22 @@ form.addEventListener('submit', async (event) => {
   const purpose = getValue('reason') === '기타' ? getValue('otherPurpose') : getValue('reason');
   const input = { mode: document.querySelector('.mode-button.active')?.dataset.mode === 'adult' ? '성인' : '청소년', item: getValue('item'), price: Number(getValue('price')), budget: Number(getValue('budget')) || 0, purpose, frequency: getValue('frequency'), hasSimilarItem: getValue('duplicate'), considersSecondhand: getValue('recycle') };
   analysisResult.classList.remove('visible'); analysisResult.setAttribute('aria-hidden', 'true'); loadingCard.classList.add('visible'); loadingCard.setAttribute('aria-hidden', 'false'); loadingCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  try { const response = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) }); const payload = await response.json(); if (!response.ok || !payload.result) throw new Error(payload.error || '분석 결과를 받지 못했습니다.'); renderAnalysis(payload.result); const record = currentUser ? await saveAnalysisRecord(payload.result, input) : null; renderReminderAction(payload.result, input, record); renderPurchaseDecision(payload.result, input, record); if (!currentUser) setTimeout(() => openSavePrompt(payload.result, input), 350); } catch (error) { showError(error.message || '잠시 후 다시 시도해 주세요.'); } finally { loadingCard.classList.remove('visible'); loadingCard.setAttribute('aria-hidden', 'true'); analysisResult.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  try {
+    const response = await fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
+    const payload = await response.json();
+    if (!response.ok || !payload.result) throw new Error(payload.error || '분석 결과를 받지 못했습니다.');
+    renderAnalysis(payload.result, input);
+    const record = currentUser ? await saveAnalysisRecord(payload.result, input) : null;
+    renderReminderAction(payload.result, input, record);
+    renderPurchaseDecision(payload.result, input, record);
+    if (!currentUser) setTimeout(() => openSavePrompt(payload.result, input), 350);
+  } catch (error) {
+    showError(error.message || '잠시 후 다시 시도해 주세요.');
+  } finally {
+    loadingCard.classList.remove('visible');
+    loadingCard.setAttribute('aria-hidden', 'true');
+    analysisResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 });
 
 resetButton.addEventListener('click', () => { loadingCard.classList.remove('visible'); loadingCard.setAttribute('aria-hidden', 'true'); analysisResult.classList.remove('visible'); analysisResult.replaceChildren(); form.reset(); document.querySelector('#otherPurpose').classList.remove('visible'); document.querySelector('#analyze').scrollIntoView({ behavior: 'smooth' }); });
