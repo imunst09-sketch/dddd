@@ -10,6 +10,7 @@ const apiKey = process.env.GEMINI_API_KEY;
 const resendApiKey = process.env.RESEND_API_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const signupWindows = new Map();
+const privacyPolicyVersion = '1.0';
 const requiredKeys = ['necessity_score', 'necessity_reason', 'opportunity_cost', 'budget_impact', 'eco_impact', 'smart_alternatives', 'final_verdict', 'encouragement_quote'];
 
 const systemPrompt = `너는 청소년과 성인의 합리적 소비를 돕는 친환경 소비 분석 엔진이다. 사용자가 보낸 구매 정보를 분석한다.
@@ -149,6 +150,7 @@ const server = http.createServer(async (req, res) => {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || password.length < 6 || password.length > 128 || !['청소년', '성인'].includes(profileType)) {
         return json(res, 400, { error: '이메일, 6자 이상 비밀번호, 프로필 유형을 확인해 주세요.' });
       }
+      if (input.privacyConsent !== true) return json(res, 400, { error: '개인정보처리방침에 동의해야 회원가입할 수 있어요.' });
       if (!allowSignupAttempt(req)) return json(res, 429, { error: '가입 요청이 많아요. 잠시 후 다시 시도해 주세요.' });
 
       let redirectTo;
@@ -163,7 +165,7 @@ const server = http.createServer(async (req, res) => {
         const signupResponse = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link?redirect_to=${encodeURIComponent(redirectTo)}`, {
           method: 'POST',
           headers: { apikey: supabaseServiceKey, Authorization: `Bearer ${supabaseServiceKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'signup', email, password, data: { profile_type: profileType } })
+          body: JSON.stringify({ type: 'signup', email, password, data: { profile_type: profileType, privacy_consent: true, privacy_policy_version: privacyPolicyVersion, privacy_consented_at: new Date().toISOString() } })
         });
         const signupPayload = await signupResponse.json().catch(() => ({}));
         if (!signupResponse.ok) {

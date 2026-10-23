@@ -41,6 +41,8 @@ const authForm = document.querySelector('#authForm');
 const authMessage = document.querySelector('#authMessage');
 const authSubmit = document.querySelector('#authSubmit');
 const profileSelect = document.querySelector('#profileSelect');
+const privacyConsentField = document.querySelector('#privacyConsentField');
+const privacyConsent = document.querySelector('#privacyConsent');
 const authTitle = document.querySelector('#authTitle');
 let supabaseClient = null;
 let supabaseSetupMessage = 'Supabase 연결 상태를 확인하고 있어요.';
@@ -61,6 +63,9 @@ function setAuthMode(nextMode) {
   document.querySelectorAll('.auth-tab').forEach((tab) => tab.classList.toggle('active', tab.dataset.authTab === nextMode));
   const signup = nextMode === 'signup';
   profileSelect.hidden = !signup;
+  privacyConsentField.hidden = !signup;
+  privacyConsent.required = signup;
+  privacyConsent.checked = false;
   authSubmit.innerHTML = signup ? '회원가입하기 <span>→</span>' : '로그인하기 <span>→</span>';
   authTitle.innerHTML = signup ? '나에게 맞는 소비 습관을<br /><span>시작해요.</span>' : '내 소비 기록을<br /><span>안전하게 저장해요.</span>';
   authMessage.textContent = '';
@@ -119,6 +124,7 @@ historyButton.addEventListener('click', async () => { openModal(historyModal); a
 
 document.querySelectorAll('[data-auth-tab]').forEach((tab) => tab.addEventListener('click', () => setAuthMode(tab.dataset.authTab)));
 document.querySelectorAll('[data-close-modal]').forEach((button) => button.addEventListener('click', () => closeModal(document.querySelector(`#${button.dataset.closeModal}`))));
+document.querySelector('#showPrivacyPolicy').addEventListener('click', () => openModal(document.querySelector('#privacyModal')));
 
 authForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -133,7 +139,7 @@ authForm.addEventListener('submit', async (event) => {
       const response = await fetch('/api/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, profileType: new FormData(authForm).get('profileType') })
+        body: JSON.stringify({ email, password, profileType: new FormData(authForm).get('profileType'), privacyConsent: privacyConsent.checked })
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) { authMessage.textContent = payload.error || '가입 확인 이메일을 보내지 못했어요.'; return; }

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="privacy.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
@@ -79,7 +80,62 @@
     <section class="quote-section"><div class="quote-mark">“</div><p>좋은 소비는<br /><em>나를 아끼는 일</em>이자<br />지구를 아끼는 일이에요.</p><span>— greenchoice team</span></section>
   </main>
   <footer class="site-footer" id="my-space"><div class="logo"><span class="logo-leaf">✦</span><span>green<span>choice</span></span></div><p>합리적 소비 & 친환경 습관 도우미</p><span>© 2026 ROOTPIE</span></footer>
-  <div class="modal-backdrop" id="authModal" hidden><section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><button class="modal-close" type="button" data-close-modal="authModal">×</button><div class="section-kicker">WELCOME TO GREENCHOICE</div><h2 id="authTitle">내 소비 기록을<br /><span>안전하게 저장해요.</span></h2><div class="auth-tabs"><button type="button" class="auth-tab active" data-auth-tab="login">로그인</button><button type="button" class="auth-tab" data-auth-tab="signup">회원가입</button></div><form id="authForm"><div class="form-field"><label for="authEmail">이메일</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required /></div><div class="form-field"><label for="authPassword">비밀번호</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="6자 이상 입력해 주세요" minlength="6" required /></div><div class="profile-select" id="profileSelect" hidden><label>프로필 유형</label><div class="profile-options"><label><input type="radio" name="profileType" value="청소년" checked /><span>청소년</span></label><label><input type="radio" name="profileType" value="성인" /><span>성인</span></label></div></div><button class="analyze-button auth-submit" type="submit" id="authSubmit">로그인하기 <span>→</span></button><p class="auth-message" id="authMessage" role="status"></p></form></section></div>
+  <div class="modal-backdrop" id="authModal" hidden>
+    <section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <button class="modal-close" type="button" data-close-modal="authModal">×</button>
+      <div class="section-kicker">WELCOME TO GREENCHOICE</div>
+      <h2 id="authTitle">내 소비 기록을<br /><span>안전하게 저장해요.</span></h2>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-auth-tab="login">로그인</button>
+        <button type="button" class="auth-tab" data-auth-tab="signup">회원가입</button>
+      </div>
+      <form id="authForm">
+        <div class="form-field"><label for="authEmail">이메일</label><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required /></div>
+        <div class="form-field"><label for="authPassword">비밀번호</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="6자 이상 입력해 주세요" minlength="6" required /></div>
+        <div class="profile-select" id="profileSelect" hidden>
+          <label>프로필 유형</label>
+          <div class="profile-options">
+            <label><input type="radio" name="profileType" value="청소년" checked /><span>청소년</span></label>
+            <label><input type="radio" name="profileType" value="성인" /><span>성인</span></label>
+          </div>
+        </div>
+        <div class="privacy-consent" id="privacyConsentField" hidden>
+          <label class="privacy-check" for="privacyConsent"><input id="privacyConsent" name="privacyConsent" type="checkbox" /><span>개인정보 수집·이용에 동의합니다 <small>필수</small></span></label>
+          <button type="button" class="privacy-link" id="showPrivacyPolicy">개인정보처리방침 보기 <span>↗</span></button>
+        </div>
+        <button class="analyze-button auth-submit" type="submit" id="authSubmit">로그인하기 <span>→</span></button>
+        <p class="auth-message" id="authMessage" role="status"></p>
+      </form>
+    </section>
+  </div>
+  <div class="modal-backdrop privacy-backdrop" id="privacyModal" hidden>
+    <section class="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+      <button class="modal-close" type="button" data-close-modal="privacyModal" aria-label="개인정보처리방침 닫기">×</button>
+      <div class="section-kicker">GREENCHOICE · PRIVACY</div>
+      <h2 id="privacyTitle">개인정보처리방침</h2>
+      <p class="privacy-version">시행일: 2026년 10월 23일 · 버전 1.0</p>
+      <div class="privacy-content">
+        <p>greenchoice는 회원가입, 소비 분석 기록 저장, 이메일 확인을 위해 필요한 개인정보를 처리합니다.</p>
+        <section><h3>1. 수집하는 정보</h3><ul>
+          <li>회원가입: 이메일 주소, 비밀번호, 프로필 유형(청소년 또는 성인)</li>
+          <li>동의 기록: 동의 여부, 정책 버전, 동의 시각</li>
+          <li>소비 분석: 물건 이름, 가격, 예산, 구매 목적, 사용 빈도, 비슷한 물건 보유 여부, 중고 고려 여부와 분석 결과</li>
+          <li>리마인드 이용 시: 이메일 주소, 물건 이름, 가격, 알림 예정 시각</li>
+        </ul></section>
+        <section><h3>2. 이용 목적</h3><p>계정 생성과 로그인, 가입 이메일 확인, 소비 분석 결과 및 이용 기록 제공, 요청한 리마인드 이메일 발송에 이용합니다.</p></section>
+        <section><h3>3. 보관 및 브라우저 저장</h3><p>계정과 분석 기록은 서비스 제공을 위해 Supabase에 저장됩니다. 일부 기록과 뱃지 정보는 편의를 위해 로그인한 기기의 브라우저 저장소에도 보관될 수 있습니다. 구체적인 보유 기간과 삭제 요청 연락처는 서비스 운영 전에 운영자가 확정해야 합니다.</p></section>
+        <section><h3>4. 외부 서비스 처리</h3><ul>
+          <li>Supabase: 계정 인증과 소비 기록 저장</li>
+          <li>Resend: 가입 확인 및 리마인드 이메일 전송</li>
+          <li>Google Gemini: 소비 분석 요청 시 물건 이름, 가격, 예산, 목적 등 분석 입력값 처리</li>
+        </ul><p>서비스 제공 과정에서 위 업체에 필요한 정보가 전송될 수 있으며, 처리 위치와 보관 조건은 각 업체 및 프로젝트 설정의 영향을 받습니다.</p></section>
+        <section><h3>5. 비밀번호와 안전한 이용</h3><p>비밀번호는 Supabase Auth를 통해 인증 처리하며 Resend 이메일 본문에는 포함하지 않습니다. 소비 분석 입력란에는 주민등록번호, 금융정보 등 분석에 필요하지 않은 민감한 정보를 입력하지 마세요.</p></section>
+        <section><h3>6. 이용자의 권리</h3><p>개인정보 열람·정정·삭제 또는 처리 중지를 요청할 수 있습니다. 운영자 연락처와 요청 처리 절차는 실제 서비스 공개 전에 이 안내에 추가해야 합니다.</p></section>
+      </div>
+      <p class="privacy-draft-note">이 안내는 현재 웹페이지 기능을 기준으로 작성한 초안입니다. 실제 서비스 운영 전 운영자 정보, 보유 기간, 문의처를 확정해 주세요.</p>
+      <button type="button" class="analyze-button privacy-done" data-close-modal="privacyModal">확인하고 돌아가기</button>
+    </section>
+  </div>
   <div class="modal-backdrop" id="savePrompt" hidden><section class="save-modal" role="dialog" aria-modal="true"><button class="modal-close" type="button" data-close-modal="savePrompt">×</button><div class="save-sparkle">✦</div><h2>분석 결과를<br /><span>저장해볼까요?</span></h2><p>로그인하면 소비 기록을 모아보고<br />친환경 챌린지에도 참여할 수 있어요.</p><div class="save-actions"><button type="button" class="analyze-button" id="saveLoginButton">로그인하고 내 소비 기록 저장하기 <span>→</span></button><button type="button" class="text-button" id="challengeLoginButton">로그인 후 챌린지 참여하기</button><button type="button" class="later-button" data-close-modal="savePrompt">나중에 할게요</button></div></section></div>
   <div class="modal-backdrop" id="historyModal" hidden><section class="history-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle"><button class="modal-close" type="button" data-close-modal="historyModal">×</button><div class="section-kicker">MY GREEN RECORD</div><h2 id="historyTitle">내 소비 히스토리<br /><span>&amp; 절약 저금통</span></h2><div class="badge-challenge"><div class="badge-heading"><div><span class="section-kicker">CONSUMPTION CHALLENGE</span><h3>작은 실천이<br /><span>멋진 뱃지</span>가 돼요.</h3></div><span class="badge-progress" id="badgeProgress">0 / 4 획득</span></div><div class="badge-grid" id="badgeGrid"></div></div><div class="dashboard-grid"><div class="dashboard-stat primary"><span>이번 달 총 분석</span><strong id="monthlyAnalyses">0회</strong><small>소비를 점검한 횟수</small></div><div class="dashboard-stat"><span>AI 추천을 따름</span><strong id="aiRecommendedBought">0회</strong><small>추천 후 구매 완료</small></div><div class="dashboard-stat"><span>비추천을 따름</span><strong id="aiFollowedAvoid">0회</strong><small>구매하지 않음</small></div><div class="dashboard-stat warning"><span>비추천인데 구매</span><strong id="aiIgnored">0회</strong><small>AI 가이드와 다른 선택</small></div><div class="dashboard-chart"><div class="chart-heading"><span>구매 목적별 지출 비중</span><small>전체 기록 기준</small></div><div class="donut-wrap"><canvas id="purposeChart" aria-label="구매 목적별 지출 비중 원형 차트"></canvas><div class="donut-center"><strong id="purposeTotal">0원</strong><span>분석 금액</span></div></div><div class="chart-legend" id="purposeLegend"></div></div><div class="dashboard-guide"><div class="chart-heading"><span>AI 가이드 준수율</span><small>추천과 실제 행동 비교</small></div><div class="guide-ring"><div><strong id="guideRate">0%</strong><span>준수율</span></div></div><p id="guideCopy">아직 충분한 기록이 없어요.<br />분석 결과를 저장해보세요.</p></div><div class="dashboard-carbon"><div class="carbon-leaf">♧</div><div><span>AI 가이드로 지킨 환경</span><strong id="carbonTrees">소나무 0그루를 심은 효과</strong><small id="carbonDetail">0kg CO₂ 절감</small></div></div></div><div class="savings-stats"><div><span>누적 절약 저금통</span><strong id="savedMoney">0원</strong></div><div><span>절감된 탄소 배출량</span><strong id="savedCarbon">0kg</strong></div></div><p class="history-intro">각 기록에서 실제 행동을 선택하면 AI 추천 준수율과 환경 효과에 반영돼요.</p><div class="history-list" id="historyList"></div></section></div>
   <div class="modal-backdrop" id="historyDetailModal" hidden><section class="history-detail-modal" role="dialog" aria-modal="true" aria-labelledby="historyDetailTitle"><button class="modal-close" type="button" data-close-modal="historyDetailModal">×</button><div class="section-kicker">COOLING CHECK-IN</div><h2 id="historyDetailTitle">아직도<br /><span>사고 싶나요?</span></h2><p class="history-detail-copy" id="historyDetailCopy"></p><div class="detail-choice-actions"><button type="button" class="detail-choice yes" data-detail-status="purchased">지금도 사고 싶어요</button><button type="button" class="detail-choice no" data-detail-status="skipped">안 사기로 했어요!</button></div><p class="auth-message" id="historyDetailMessage"></p></section></div>

@@ -1,0 +1,25 @@
+.privacy-consent[hidden] { display: none; }
+.privacy-consent { display: grid; gap: 8px; margin: -4px 0 18px; padding: 13px; border: 1px solid var(--line); border-radius: 9px; background: #f8fbf5; }
+.privacy-check { display: flex !important; align-items: center; gap: 8px; margin: 0 !important; color: var(--deep); font-size: 12px !important; font-weight: 700 !important; cursor: pointer; }
+.privacy-check input { width: 17px; height: 17px; flex: 0 0 auto; margin: 0; accent-color: var(--green); }
+.privacy-check small { color: #8bb06e; font-size: 10px; }
+.privacy-link { justify-self: start; padding: 0; border: 0; color: var(--green); background: transparent; font-size: 11px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.privacy-backdrop { z-index: 60; }
+.modal-backdrop.privacy-backdrop[hidden] { display: none; }
+.privacy-modal { width: min(100%, 720px); max-height: calc(100vh - 40px); overflow-y: auto; position: relative; padding: 34px 38px; border-radius: 18px; background: #fffefa; box-shadow: 0 25px 80px rgba(30, 70, 50, .2); }
+.privacy-modal h2 { margin: 8px 0 2px; color: var(--deep); font-size: 29px; letter-spacing: -.07em; }
+.privacy-version { margin: 0 0 22px; color: #91a49a; font-size: 11px; }
+.privacy-content { color: #5e7569; font-size: 12px; line-height: 1.8; }
+.privacy-content > p { margin: 0 0 16px; }
+.privacy-content section { padding: 13px 0; border-top: 1px solid #e6eee7; }
+.privacy-content h3 { margin: 0 0 5px; color: var(--deep); font-size: 14px; }
+.privacy-content p { margin: 0; }
+.privacy-content ul { display: grid; gap: 4px; margin: 5px 0 8px; padding-left: 19px; }
+.privacy-draft-note { margin: 15px 0; padding: 11px 13px; border-radius: 8px; color: #7f7652; background: #fbf5df; font-size: 11px; line-height: 1.65; }
+.privacy-done { width: 100%; min-height: 43px; }
+
+@media (max-width: 760px) {
+  .privacy-modal { max-height: calc(100vh - 24px); padding: 28px 22px; }
+  .privacy-modal h2 { font-size: 25px; }
+  .privacy-content { font-size: 11px; }
+}
