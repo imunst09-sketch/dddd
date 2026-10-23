@@ -43,6 +43,8 @@ const authSubmit = document.querySelector('#authSubmit');
 const profileSelect = document.querySelector('#profileSelect');
 const authTitle = document.querySelector('#authTitle');
 let supabaseClient = null;
+let supabaseSetupMessage = 'Supabase 연결 상태를 확인하고 있어요.';
+let supabaseReadyPromise = null;
 let currentUser = null;
 let authMode = 'login';
 let pendingResult = null;
@@ -86,14 +88,20 @@ function updateAccount(user) {
 async function initSupabase() {
   try {
     const response = await fetch('/api/config');
+    if (!response.ok) throw new Error('설정 응답 오류');
     const config = await response.json();
-    if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase) return;
-    supabaseClient = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+    if (!config.supabaseUrl) { supabaseSetupMessage = 'Supabase 프로젝트 URL이 서버 설정에 없어요.'; return; }
+    if (!config.supabaseAnonKey) { supabaseSetupMessage = 'Supabase 공개 API 키가 서버 설정에 없어요.'; return; }
+    if (!window.supabase) { supabaseSetupMessage = 'Supabase 인증 라이브러리를 불러오지 못했어요.'; return; }
+    const projectUrl = new URL(config.supabaseUrl);
+    projectUrl.pathname = projectUrl.pathname.replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '') || '/';
+    supabaseClient = window.supabase.createClient(projectUrl.toString().replace(/\/$/, ''), config.supabaseAnonKey);
     const { data } = await supabaseClient.auth.getSession();
     updateAccount(data.session?.user || null);
     supabaseClient.auth.onAuthStateChange(async (_event, session) => { updateAccount(session?.user || null); if (session?.user && pendingHistoryId) await openHistoryDetail(pendingHistoryId); });
+    supabaseSetupMessage = '';
     if (pendingHistoryId) { if (data.session?.user) await openHistoryDetail(pendingHistoryId); else openAuth('login'); }
-  } catch { /* Auth를 사용할 수 없어도 비로그인 체험은 계속합니다. */ }
+  } catch { supabaseSetupMessage = 'Supabase 연결 설정을 확인하지 못했어요. 프로젝트 URL과 공개 API 키를 확인해 주세요.'; }
 }
 
 function openAuth(nextMode = 'login') { setAuthMode(nextMode); openModal(authModal); setTimeout(() => document.querySelector('#authEmail').focus(), 0); }
@@ -114,21 +122,39 @@ document.querySelectorAll('[data-close-modal]').forEach((button) => button.addEv
 
 authForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  if (!supabaseClient) { authMessage.textContent = 'Supabase 설정을 확인할 수 없어요. 잠시 후 다시 시도해 주세요.'; return; }
   authSubmit.disabled = true;
-  authMessage.textContent = authMode === 'signup' ? '계정을 만들고 있어요...' : '로그인하고 있어요...';
-  const email = document.querySelector('#authEmail').value.trim();
-  const password = document.querySelector('#authPassword').value;
-  const result = authMode === 'signup'
-    ? await supabaseClient.auth.signUp({ email, password, options: { data: { profile_type: new FormData(authForm).get('profileType') } } })
-    : await supabaseClient.auth.signInWithPassword({ email, password });
-  authSubmit.disabled = false;
-  if (result.error) { authMessage.textContent = result.error.message.includes('already registered') ? '이미 가입된 이메일이에요. 로그인해 주세요.' : result.error.message; return; }
-  authMessage.textContent = authMode === 'signup' && !result.data.session ? '가입 확인 이메일을 보냈어요. 이메일을 확인한 뒤 로그인해 주세요.' : '로그인되었습니다.';
-  if (result.data.session) {
-    closeModal(authModal);
-    if (pendingResult) { const savedRecord = await saveAnalysisRecord(pendingResult, pendingInput); renderReminderAction(pendingResult, pendingInput, savedRecord); renderPurchaseDecision(pendingResult, pendingInput, savedRecord); pendingResult = null; pendingInput = null; }
-    if (pendingHistoryId) await openHistoryDetail(pendingHistoryId);
+  try {
+    await supabaseReadyPromise;
+    if (!supabaseClient) { authMessage.textContent = supabaseSetupMessage; return; }
+    authMessage.textContent = authMode === 'signup' ? '계정을 만들고 있어요...' : '로그인하고 있어요...';
+    const email = document.querySelector('#authEmail').value.trim();
+    const password = document.querySelector('#authPassword').value;
+    const result = authMode === 'signup'
+      ? await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin, data: { profile_type: new FormData(authForm).get('profileType') } } })
+      : await supabaseClient.auth.signInWithPassword({ email, password });
+    if (result.error) {
+      const message = result.error.message.toLowerCase();
+      authMessage.textContent = message.includes('already registered')
+        ? '이미 가입된 이메일이에요. 로그인해 주세요.'
+        : message.includes('invalid login credentials')
+          ? '이메일 또는 비밀번호를 확인해 주세요.'
+          : message.includes('email not confirmed')
+            ? '가입 확인 이메일에서 인증을 완료한 뒤 로그인해 주세요.'
+            : message.includes('redirect')
+              ? 'Supabase Auth URL 설정에 현재 사이트 주소를 허용해 주세요.'
+            : result.error.message;
+      return;
+    }
+    authMessage.textContent = authMode === 'signup' && !result.data.session ? '가입 확인 이메일을 보냈어요. 이메일을 확인한 뒤 로그인해 주세요.' : '로그인되었습니다.';
+    if (result.data.session) {
+      closeModal(authModal);
+      if (pendingResult) { const savedRecord = await saveAnalysisRecord(pendingResult, pendingInput); renderReminderAction(pendingResult, pendingInput, savedRecord); renderPurchaseDecision(pendingResult, pendingInput, savedRecord); pendingResult = null; pendingInput = null; }
+      if (pendingHistoryId) await openHistoryDetail(pendingHistoryId);
+    }
+  } catch {
+    authMessage.textContent = 'Supabase에 연결하지 못했어요. 프로젝트 URL, 공개 API 키와 Auth 설정을 확인해 주세요.';
+  } finally {
+    authSubmit.disabled = false;
   }
 });
 
@@ -346,4 +372,4 @@ form.addEventListener('submit', async (event) => {
 
 resetButton.addEventListener('click', () => { loadingCard.classList.remove('visible'); loadingCard.setAttribute('aria-hidden', 'true'); analysisResult.classList.remove('visible'); analysisResult.replaceChildren(); form.reset(); document.querySelector('#otherPurpose').classList.remove('visible'); document.querySelector('#analyze').scrollIntoView({ behavior: 'smooth' }); });
 
-initSupabase();
+supabaseReadyPromise = initSupabase();

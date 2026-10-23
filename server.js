@@ -2,6 +2,8 @@ const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+try { process.loadEnvFile(); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+
 const root = __dirname;
 const port = Number(process.env.PORT || 3000);
 const apiKey = process.env.GEMINI_API_KEY;
